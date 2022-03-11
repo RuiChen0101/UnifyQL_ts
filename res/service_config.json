@@ -1,0 +1,29 @@
+[
+    {
+        "serviceName": "user",
+        "tables": [
+            "user"
+        ]
+    },
+    {
+        "serviceName": "merch",
+        "tables": [
+            "merch_item",
+            "merch_order"
+        ]
+    },
+    {
+        "serviceName": "logistic",
+        "tables": [
+            "logistic",
+            "shipping_timeline",
+            "logistic_provider"
+        ]
+    },
+    {
+        "serviceName": "payment",
+        "tables": [
+            "payment"
+        ]
+    }
+]
