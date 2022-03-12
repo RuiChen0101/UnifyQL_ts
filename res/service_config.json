@@ -1,19 +1,19 @@
 [
     {
-        "serviceName": "user",
+        "serviceName": "userService",
         "tables": [
             "user"
         ]
     },
     {
-        "serviceName": "merch",
+        "serviceName": "merchService",
         "tables": [
             "merch_item",
             "merch_order"
         ]
     },
     {
-        "serviceName": "logistic",
+        "serviceName": "logisticService",
         "tables": [
             "logistic",
             "shipping_timeline",
@@ -21,7 +21,7 @@
         ]
     },
     {
-        "serviceName": "payment",
+        "serviceName": "paymentService",
         "tables": [
             "payment"
         ]
