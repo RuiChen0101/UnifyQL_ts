@@ -1,9 +1,8 @@
 import 'mocha';
 import { expect } from 'chai';
-import IServiceLookup from '../../src/lookup/IServiceLookup';
 import ServiceLookup from '../../src/lookup/ServiceLookup';
 
-const serviceLookup: IServiceLookup = new ServiceLookup();
+const serviceLookup: ServiceLookup = new ServiceLookup();
 
 describe('ServiceLookup', () => {
     it('should get serviceName by table', () => {
@@ -27,6 +26,7 @@ describe('ServiceLookup', () => {
     });
 
     it('should return false if given tables is not from same service', () => {
+        expect(serviceLookup.isAllFromSameService([])).to.be.false;
         expect(serviceLookup.isAllFromSameService(['logistic', 'user'])).to.be.false;
         expect(serviceLookup.isAllFromSameService(['payment', 'merch_order'])).to.be.false;
     });

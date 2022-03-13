@@ -16,7 +16,7 @@ class ServiceLookup implements IServiceLookup {
     }
 
     public isAllFromSameService(tables: string[]): boolean {
-        if (tables === undefined) return false;
+        if (tables === undefined || tables.length === 0) return false;
         let refService: string | undefined = undefined;
         for (const table of tables) {
             if (refService === undefined) {
