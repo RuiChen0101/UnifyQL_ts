@@ -3,7 +3,7 @@ import ExpressionTreeBuilder from "./ExpressionTreeBuilder";
 import IExpressionTreeNode from "./ExpressionTreeNode";
 
 type ModifierOp = '&' | '|' | '+' | '-' | '*' | '/';
-type ConditionOp = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'IS NULL' | 'IS NOT NULL' | 'IN';
+type ConditionOp = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'LIKE' | 'IS NULL' | 'IS NOT NULL' | 'IN';
 
 class ConditionNode extends IExpressionTreeNode {
     public readonly conditionStr: string;
@@ -17,8 +17,8 @@ class ConditionNode extends IExpressionTreeNode {
     constructor(conditionStr: string) {
         super();
         this.conditionStr = conditionStr;
-        const rx: RegExp = /[\(]?\s*([\d\w]*)\.([\d\w]*)\s*([\&\|\+\-\*\/])?\s*([\"\d\w]*)?\s*[\)]?\s*(=|!=|<|<=|>|>=|IS NULL|IS NOT NULL|IN)\s*(.*)?/g;
-        const capturedGroups: RegExpExecArray | null = rx.exec(this.conditionStr);
+        const regex: RegExp = /[\(]?\s*([\d\w]*)\.([\d\w]*)\s*([\&\|\+\-\*\/])?\s*([\"\d\w]*)?\s*[\)]?\s*(=|!=|<|<=|>|>=|LIKE|IS NULL|IS NOT NULL|IN)\s*(.*)?/g;
+        const capturedGroups: RegExpExecArray | null = regex.exec(this.conditionStr);
         if (capturedGroups === null) throw new ExpressionTreeBuildException('Condition info format mismatch');
         this.table = capturedGroups[1];
         this.field = capturedGroups[2];
