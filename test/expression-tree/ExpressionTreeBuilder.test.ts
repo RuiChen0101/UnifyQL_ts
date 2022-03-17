@@ -13,35 +13,35 @@ describe('ExpressionTreeBuilder', () => {
         expect((expressionTree as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
     });
 
-    it('should build new andNode and append exist tree to right branch when call buildAnd', () => {
+    it('should build new andNode and append exist tree to left branch when call buildAnd', () => {
         const builder: ExpressionTreeBuilder = new ExpressionTreeBuilder();
         builder.buildCondition('(tableB.fieldB & 2) != 0');
         builder.buildAnd();
         const expressionTree: IExpressionTreeNode = builder.getResult();
         expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('AND');
-        expect((expressionTree.rightNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
+        expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
     });
 
-    it('should build new condition node and append itself to the tree\'s left branch when call buildCondition with exist tree', () => {
+    it('should build new condition node and append itself to the tree\'s right branch when call buildCondition with exist tree', () => {
         const builder: ExpressionTreeBuilder = new ExpressionTreeBuilder();
         builder.buildCondition('(tableB.fieldB & 2) != 0');
         builder.buildAnd();
         builder.buildCondition('tableA.fieldA IN ("0912","0934")');
         const expressionTree: IExpressionTreeNode = builder.getResult();
         expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('AND');
-        expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('tableA.fieldA IN ("0912","0934")');
-        expect((expressionTree.rightNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
+        expect((expressionTree.rightNode as ConditionNode).conditionStr).to.be.equal('tableA.fieldA IN ("0912","0934")');
+        expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
     });
 
-    it('should build new orNode, append exist tree to right, push tree to stack and set current tree to undefined branch when call buildOr', () => {
+    it('should build new orNode, append exist tree to right, push tree to stack and set current tree to right branch when call buildOr', () => {
         const builder: ExpressionTreeBuilder = new ExpressionTreeBuilder();
         builder.buildCondition('(tableB.fieldB & 2) != 0');
         builder.buildOr();
         builder.buildCondition('tableA.fieldA IN ("0912","0934")');
         const expressionTree: IExpressionTreeNode = builder.getResult();
         expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('OR');
-        expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('tableA.fieldA IN ("0912","0934")');
-        expect((expressionTree.rightNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
+        expect((expressionTree.rightNode as ConditionNode).conditionStr).to.be.equal('tableA.fieldA IN ("0912","0934")');
+        expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
     });
 
     it('should build correct result mixing AND and OR', () => {
@@ -53,11 +53,11 @@ describe('ExpressionTreeBuilder', () => {
         builder.buildCondition('tableC.fieldC LIKE "O%"');
         const expressionTree: IExpressionTreeNode = builder.getResult();
         expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('OR');
-        expect((expressionTree.rightNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
-        const andNode: IExpressionTreeNode = expressionTree.leftNode!;
+        expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
+        const andNode: IExpressionTreeNode = expressionTree.rightNode!;
         expect((andNode as BinaryOperatorNode).opType).to.be.equal('AND');
-        expect((andNode.leftNode as ConditionNode).conditionStr).to.be.equal('tableC.fieldC LIKE "O%"');
-        expect((andNode.rightNode as ConditionNode).conditionStr).to.be.equal('tableA.fieldA IN ("0912","0934")');
+        expect((andNode.rightNode as ConditionNode).conditionStr).to.be.equal('tableC.fieldC LIKE "O%"');
+        expect((andNode.leftNode as ConditionNode).conditionStr).to.be.equal('tableA.fieldA IN ("0912","0934")');
     });
 
     it('should build correct result with parentheses', () => {
@@ -71,10 +71,34 @@ describe('ExpressionTreeBuilder', () => {
         builder.endBuildParentheses();
         const expressionTree: IExpressionTreeNode = builder.getResult();
         expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('AND');
-        expect((expressionTree.rightNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
-        const orNode: IExpressionTreeNode = expressionTree.leftNode!;
+        expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
+        const orNode: IExpressionTreeNode = expressionTree.rightNode!;
         expect((orNode as BinaryOperatorNode).opType).to.be.equal('OR');
-        expect((orNode.leftNode as ConditionNode).conditionStr).to.be.equal('tableC.fieldC LIKE "O%"');
-        expect((orNode.rightNode as ConditionNode).conditionStr).to.be.equal('tableA.fieldA IN ("0912","0934")');
+        expect((orNode.rightNode as ConditionNode).conditionStr).to.be.equal('tableC.fieldC LIKE "O%"');
+        expect((orNode.leftNode as ConditionNode).conditionStr).to.be.equal('tableA.fieldA IN ("0912","0934")');
+    });
+
+    it('should build correct result with all parentheses split', () => {
+        const builder: ExpressionTreeBuilder = new ExpressionTreeBuilder();
+        builder.startBuildParentheses();
+        builder.buildCondition('tableB.fieldB & 2');
+        builder.endBuildParentheses();
+        builder.buildCondition(' != 0');
+        builder.buildAnd();
+        builder.startBuildParentheses();
+        builder.buildCondition('tableA.fieldA IN ');
+        builder.startBuildParentheses();
+        builder.buildCondition('"0912","0934"');
+        builder.endBuildParentheses();
+        builder.buildOr();
+        builder.buildCondition('tableC.fieldC LIKE "O%"');
+        builder.endBuildParentheses();
+        const expressionTree: IExpressionTreeNode = builder.getResult();
+        expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('AND');
+        expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
+        const orNode: IExpressionTreeNode = expressionTree.rightNode!;
+        expect((orNode as BinaryOperatorNode).opType).to.be.equal('OR');
+        expect((orNode.rightNode as ConditionNode).conditionStr).to.be.equal('tableC.fieldC LIKE "O%"');
+        expect((orNode.leftNode as ConditionNode).conditionStr).to.be.equal('tableA.fieldA IN ("0912","0934")');
     });
 });

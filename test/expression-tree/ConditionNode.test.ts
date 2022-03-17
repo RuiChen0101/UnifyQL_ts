@@ -24,4 +24,11 @@ describe('ConditionNode', () => {
         expect(conditionNode.conditionOp).to.be.equal('!=');
         expect(conditionNode.conditionValue).to.be.equal('0');
     });
+
+    it('should check weather or not the string is valid condition', () => {
+        expect(ConditionNode.isValidCondition('tableA.fieldA IN ("0912","0934")')).to.be.true;
+        expect(ConditionNode.isValidCondition('tableA.fieldA IN ')).to.be.false;
+        expect(ConditionNode.isValidCondition('tableB.fieldB & 2')).to.be.false;
+        expect(ConditionNode.isValidCondition('"0912","0934"')).to.be.false;
+    });
 });

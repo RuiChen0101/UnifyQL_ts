@@ -17,7 +17,7 @@ class ConditionNode extends IExpressionTreeNode {
     constructor(conditionStr: string) {
         super();
         this.conditionStr = conditionStr;
-        const regex: RegExp = /[\(]?\s*([\d\w]*)\.([\d\w]*)\s*([\&\|\+\-\*\/])?\s*([\"\d\w]*)?\s*[\)]?\s*(=|!=|<|<=|>|>=|LIKE|IS NULL|IS NOT NULL|IN)\s*(.*)?/g;
+        const regex: RegExp = /[\(]?\s*([\d\w]*)\.([\d\w]*)\s*([\&\|\+\-\*\/])?\s*([\"\d\w]*)?\s*[\)]?\s*(=|!=|<|<=|>|>=|LIKE|NOT IN|IN|IS NULL|IS NOT NULL)\s*([^\s]+)*|/g;
         const capturedGroups: RegExpExecArray | null = regex.exec(this.conditionStr);
         if (capturedGroups === null) throw new ExpressionTreeBuildException('Condition info format mismatch');
         this.table = capturedGroups[1];
@@ -26,6 +26,11 @@ class ConditionNode extends IExpressionTreeNode {
         this.modifyValue = capturedGroups[4];
         this.conditionOp = capturedGroups[5] as ConditionOp;
         this.conditionValue = capturedGroups[6];
+    }
+
+    public static isValidCondition(str: string): boolean {
+        const regex: RegExp = /[\(]?\s*([\d\w]*)\.([\d\w]*)\s*([\&\|\+\-\*\/])?\s*([\"\d\w]*)?\s*[\)]?\s*(=|!=|<|<=|>|>=|LIKE|NOT IN|IN)\s*([^\s]+)|[\(]?\s*([\d\w]*)\.([\d\w]*)\s*([\&\|\+\-\*\/])?\s*([\"\d\w]*)?\s*[\)]?\s*(IS NULL|IS NOT NULL)/g;
+        return regex.test(str);
     }
 }
 
