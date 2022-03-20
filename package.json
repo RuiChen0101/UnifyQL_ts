@@ -11,7 +11,7 @@
         "start": "npm run build && node ./build/index.js",
         "build": "tsc",
         "test": "mocha --require ts-node/register test/**/*.test.ts --exit --recursive",
-        "test-coverage": "nyc --reporter=text mocha -r ts-node/register 'test/**/*.test.ts' --exit --recursive"
+        "test-coverage": "nyc --reporter=text mocha -r ts-node/register --require test/init.test.ts 'test/**/*.test.ts' --exit --recursive"
     },
     "author": "RuiChen",
     "license": "MIT",

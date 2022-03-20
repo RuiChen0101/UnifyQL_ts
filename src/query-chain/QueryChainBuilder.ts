@@ -1,6 +1,6 @@
 import QueryChain from "./QueryChain";
 import IQueryChainRelation from "./IQueryChainRelation";
-import QueryChainBuildException from "../exception/QueryChainBuildException";
+import QueryChainException from "../exception/QueryChainException";
 
 type IQueryChainRelationMap = { [key: string]: { [key: string]: IQueryChainRelation } };
 
@@ -14,7 +14,7 @@ class QueryChainBuilder {
         for (const relation of relations) {
             const tableRelation: IQueryChainRelation = this.extractRelation(relation);
             if (!definedTables.includes(tableRelation.fromTable) || !definedTables.includes(tableRelation.toTable)) {
-                throw new QueryChainBuildException(`${relation} using undefined table`);
+                throw new QueryChainException(`${relation} using undefined table`);
             }
             this.safeMapAssign(this.completeRelationMap, tableRelation.fromTable, tableRelation.toTable, tableRelation);
             this.safeMapAssign(

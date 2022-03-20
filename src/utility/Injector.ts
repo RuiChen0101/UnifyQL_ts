@@ -2,7 +2,8 @@ class Injector {
     private instancesPool: { [key: string]: any } = {}
 
     private lazyInstancesFactory: { [key: string]: () => any } = {
-        ServiceConfigSource: () => new (require('../lookup/FileServiceConfigSource')).default()
+        ServiceConfigSource: () => new (require('../lookup/FileServiceConfigSource')).default(),
+        ServiceLookup: () => new (require('../lookup/ServiceLookup')).default()
     }
 
     public get<T>(name: string): T {

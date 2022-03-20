@@ -1,7 +1,6 @@
 import 'mocha';
 import { expect } from 'chai';
 import QueryChainBuilder from '../../src/query-chain/QueryChainBuilder';
-import IQueryChainRelation from '../../src/query-chain/IQueryChainRelation';
 
 describe('QueryChainBuilder', () => {
     it('should build query chain', () => {

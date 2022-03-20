@@ -1,0 +1,18 @@
+[
+    {
+        "serviceName": "aService",
+        "tables": [
+            "tableA",
+            "tableB",
+            "tableC"
+        ]
+    },
+    {
+        "serviceName": "bService",
+        "tables": [
+            "tableD",
+            "tableE",
+            "tableF"
+        ]
+    }
+]

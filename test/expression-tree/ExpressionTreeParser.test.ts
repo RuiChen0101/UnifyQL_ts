@@ -4,8 +4,23 @@ import ExpressionTreeParser from '../../src/expression-tree/ExpressionTreeParser
 import IExpressionTreeNode from '../../src/expression-tree/ExpressionTreeNode';
 
 describe('ExpressionTreeParser', () => {
+    it('should parse where condition to expression node', () => {
+        const whereStr: string = '(tableB.fieldB & 2) != 0';
+        const parser: ExpressionTreeParser = new ExpressionTreeParser();
+        const resultTree: IExpressionTreeNode = parser.parse(whereStr);
+        expect(resultTree).to.be.deep.equal({
+            "conditionOp": "!=",
+            "conditionStr": "(tableB.fieldB & 2)!= 0",
+            "conditionValue": "0",
+            "field": "fieldB",
+            "modifier": "&",
+            "modifyValue": "2",
+            "table": "tableB"
+        });
+    });
+
     it('should parse where str to expression tree', () => {
-        const whereStr: string = '(tableB.fieldB & 2) != 0 OR tableA.fieldA IN("0912","0934")AND tableC.fieldC LIKE "O%"';
+        const whereStr: string = '(tableB.fieldB & 2) != 0 OR tableA.fieldA IN ("0912","0934") AND tableC.fieldC LIKE "O%"';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const resultTree: IExpressionTreeNode = parser.parse(whereStr);
         expect(resultTree).to.be.deep.equal({

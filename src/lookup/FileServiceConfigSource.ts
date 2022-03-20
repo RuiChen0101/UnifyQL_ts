@@ -5,8 +5,8 @@ class FileServiceConfigSource implements IServiceConfigSource {
     private serviceConfigs: { [key: string]: IServiceConfig } = {};
     private tableMapping: { [key: string]: string } = {};
 
-    constructor() {
-        const fileConfigs: IServiceConfig[] = require('../../res/service_config.json');
+    constructor(fileName: string = '../../res/service_config.json') {
+        const fileConfigs: IServiceConfig[] = require(fileName);
         for (const fileConfig of fileConfigs) {
             const serviceName: string = fileConfig.serviceName;
             this.serviceConfigs[serviceName] = fileConfig;
