@@ -26,7 +26,7 @@ describe('RelationExpander', () => {
         expect(resultTable).to.be.equal('tableC');
         expect(resultTree).to.be.deep.equal({
             "conditionOp": "!=",
-            "conditionStr": "(tableC.fieldC1 & 2)!= 0",
+            "conditionStr": "(tableC.fieldC1 & 2) != 0",
             "conditionValue": "0",
             "field": "fieldC1",
             "modifier": "&",
@@ -78,6 +78,7 @@ describe('RelationExpander', () => {
                 "toField": "fieldA1",
                 "toTable": "tableA",
             },
+            "_outputTarget": "tableA",
             "opType": "AND",
         });
     });
@@ -119,6 +120,7 @@ describe('RelationExpander', () => {
                 "modifyValue": undefined,
                 "table": "tableC",
             },
+            "_outputTarget": "tableC",
             "opType": "AND",
         });
     });
@@ -152,14 +154,21 @@ describe('RelationExpander', () => {
                 "table": "tableB",
             },
             "_rightNode": {
-                "conditionOp": "=",
-                "conditionStr": "tableC.fieldC1 = 1",
-                "conditionValue": "1",
-                "field": "fieldC1",
-                "modifier": undefined,
-                "modifyValue": undefined,
-                "table": "tableC",
+                "_leftNode": {
+                    "conditionOp": "=",
+                    "conditionStr": "tableC.fieldC1 = 1",
+                    "conditionValue": "1",
+                    "field": "fieldC1",
+                    "modifier": undefined,
+                    "modifyValue": undefined,
+                    "table": "tableC",
+                },
+                "fromField": "fieldC",
+                "fromTable": "tableC",
+                "toField": "fieldB1",
+                "toTable": "tableB"
             },
+            "_outputTarget": "tableB",
             "opType": "AND",
         });
     });
@@ -203,6 +212,7 @@ describe('RelationExpander', () => {
                         "modifyValue": undefined,
                         "table": "tableD",
                     },
+                    "_outputTarget": "tableD",
                     "opType": "AND",
                 },
                 "fromField": "fieldD",
@@ -213,13 +223,19 @@ describe('RelationExpander', () => {
             "_rightNode": {
                 "_leftNode": {
                     "_leftNode": {
-                        "conditionOp": "=",
-                        "conditionStr": "tableC.fieldC1 = 2",
-                        "conditionValue": "2",
-                        "field": "fieldC1",
-                        "modifier": undefined,
-                        "modifyValue": undefined,
-                        "table": "tableC",
+                        "_leftNode": {
+                            "conditionOp": "=",
+                            "conditionStr": "tableC.fieldC1 = 2",
+                            "conditionValue": "2",
+                            "field": "fieldC1",
+                            "modifier": undefined,
+                            "modifyValue": undefined,
+                            "table": "tableC",
+                        },
+                        "fromField": "fieldC",
+                        "fromTable": "tableC",
+                        "toField": "fieldB1",
+                        "toTable": "tableB"
                     },
                     "_rightNode": {
                         "conditionOp": "=",
@@ -230,6 +246,7 @@ describe('RelationExpander', () => {
                         "modifyValue": undefined,
                         "table": "tableB",
                     },
+                    "_outputTarget": "tableB",
                     "opType": "OR",
                 },
                 "fromField": "fieldB2",
@@ -237,6 +254,7 @@ describe('RelationExpander', () => {
                 "toField": "fieldA2",
                 "toTable": "tableA",
             },
+            "_outputTarget": "tableA",
             "opType": "AND",
         });
     });
@@ -272,14 +290,21 @@ describe('RelationExpander', () => {
                     "table": "tableB",
                 },
                 "_rightNode": {
-                    "conditionOp": "=",
-                    "conditionStr": "tableC.fieldC1 = 1",
-                    "conditionValue": "1",
-                    "field": "fieldC1",
-                    "modifier": undefined,
-                    "modifyValue": undefined,
-                    "table": "tableC",
+                    "_leftNode": {
+                        "conditionOp": "=",
+                        "conditionStr": "tableC.fieldC1 = 1",
+                        "conditionValue": "1",
+                        "field": "fieldC1",
+                        "modifier": undefined,
+                        "modifyValue": undefined,
+                        "table": "tableC",
+                    },
+                    "fromField": "fieldC",
+                    "fromTable": "tableC",
+                    "toField": "fieldB1",
+                    "toTable": "tableB"
                 },
+                "_outputTarget": "tableB",
                 "opType": "AND",
             },
             "fromField": "fieldB2",
@@ -333,6 +358,7 @@ describe('RelationExpander', () => {
                 "modifyValue": undefined,
                 "table": "tableA",
             },
+            "_outputTarget": "tableA",
             "opType": "AND",
         });
     });

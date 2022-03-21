@@ -10,7 +10,7 @@ describe('ExpressionTreeParser', () => {
         const resultTree: IExpressionTreeNode = parser.parse(whereStr);
         expect(resultTree).to.be.deep.equal({
             "conditionOp": "!=",
-            "conditionStr": "(tableB.fieldB & 2)!= 0",
+            "conditionStr": "(tableB.fieldB & 2) != 0",
             "conditionValue": "0",
             "field": "fieldB",
             "modifier": "&",
@@ -36,7 +36,7 @@ describe('ExpressionTreeParser', () => {
                 },
                 "_leftNode": {
                     "conditionOp": "IN",
-                    "conditionStr": "tableA.fieldA IN(\"0912\",\"0934\")",
+                    "conditionStr": "tableA.fieldA IN (\"0912\",\"0934\")",
                     "conditionValue": "(\"0912\",\"0934\")",
                     "field": "fieldA",
                     "modifier": undefined,
@@ -47,7 +47,7 @@ describe('ExpressionTreeParser', () => {
             },
             "_leftNode": {
                 "conditionOp": "!=",
-                "conditionStr": "(tableB.fieldB & 2)!= 0",
+                "conditionStr": "(tableB.fieldB & 2) != 0",
                 "conditionValue": "0",
                 "field": "fieldB",
                 "modifier": "&",

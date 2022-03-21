@@ -16,8 +16,8 @@ describe('ServiceLookup', () => {
     });
 
     it('should return true if given tables is from same service', () => {
-        expect(serviceLookup.isAllFromSameService(['tableA', 'tableB'])).to.be.true;
-        expect(serviceLookup.isAllFromSameService(['tableD', 'tableE'])).to.be.true;
+        expect(serviceLookup.isAllFromSameService(['tableA', 'tableB', 'tableC'])).to.be.true;
+        expect(serviceLookup.isAllFromSameService(['tableD', 'tableE', 'tableF'])).to.be.true;
         expect(serviceLookup.isAllFromSameService(['tableA'])).to.be.true;
     });
 

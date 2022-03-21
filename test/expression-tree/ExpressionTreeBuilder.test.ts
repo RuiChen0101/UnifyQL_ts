@@ -83,7 +83,7 @@ describe('ExpressionTreeBuilder', () => {
         builder.startBuildParentheses();
         builder.buildCondition('tableB.fieldB & 2');
         builder.endBuildParentheses();
-        builder.buildCondition(' != 0');
+        builder.buildCondition('!= 0');
         builder.buildAnd();
         builder.startBuildParentheses();
         builder.buildCondition('tableA.fieldA IN ');

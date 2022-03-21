@@ -97,7 +97,7 @@ class ExpressionTreeBuilder {
         if (this._nodeStack[stackLength - 1] instanceof BrokenConditionNode && this._nodeStack[stackLength - 2] instanceof BrokenConditionNode) {
             const node1: BrokenConditionNode = this._nodeStack.pop() as BrokenConditionNode;
             const node2: BrokenConditionNode = this._nodeStack.pop() as BrokenConditionNode;
-            this.buildCondition(node2.condition + node1.condition);
+            this.buildCondition(node2.condition.trim() + ' ' + node1.condition.trim());
         }
     }
 

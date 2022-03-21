@@ -20,6 +20,9 @@ class RelationExpander {
 
     public expand(): string {
         this._resultTable = this._expand();
+        if (this._expressionTree instanceof BinaryOperatorNode) {
+            (this._expressionTree as BinaryOperatorNode).setOutputTarget(this._resultTable);
+        }
         return this._resultTable;
     }
 
@@ -49,30 +52,19 @@ class RelationExpander {
         let leftNodeResultTable: string;
         let rightNodeResultTable: string;
 
-        if (rootNode.leftNode instanceof BinaryOperatorNode) {
-            const expander = new RelationExpander(rootNode.leftNode, this._queryChain);
-            leftNodeResultTable = expander.expand();
-            rootNode.setLeftNode(expander.getResult());
-        } else if (rootNode.leftNode instanceof ConditionNode) {
-            leftNodeResultTable = (rootNode.leftNode as ConditionNode).table;
-        } else {
+        if (rootNode.leftNode === undefined || rootNode.rightNode === undefined) {
             throw new RelationExpanderException('Invalid expression tree');
         }
 
-        if (rootNode.rightNode instanceof BinaryOperatorNode) {
-            const expander = new RelationExpander(rootNode.rightNode, this._queryChain);
-            rightNodeResultTable = expander.expand();
-            rootNode.setRightNode(expander.getResult());
-        } else if (rootNode.rightNode instanceof ConditionNode) {
-            rightNodeResultTable = (rootNode.rightNode as ConditionNode).table;
-        } else {
-            throw new RelationExpanderException('Invalid expression tree');
-        }
+        const leftExpander = new RelationExpander(rootNode.leftNode, this._queryChain);
+        leftNodeResultTable = leftExpander.expand();
+        rootNode.setLeftNode(leftExpander.getResult());
+
+        const rightExpander = new RelationExpander(rootNode.rightNode!, this._queryChain);
+        rightNodeResultTable = rightExpander.expand();
+        rootNode.setRightNode(rightExpander.getResult());
 
         if (leftNodeResultTable === rightNodeResultTable) return leftNodeResultTable;
-        if (injector.get<ServiceLookup>('ServiceLookup').isAllFromSameService([leftNodeResultTable, rightNodeResultTable])) {
-            return this._queryChain.isParentOf(leftNodeResultTable, rightNodeResultTable) ? leftNodeResultTable : rightNodeResultTable;
-        }
 
         const commonParent: string = this._queryChain.findLowestCommonParent(rightNodeResultTable, leftNodeResultTable);
 

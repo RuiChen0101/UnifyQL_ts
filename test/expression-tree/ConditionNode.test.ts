@@ -23,6 +23,7 @@ describe('ConditionNode', () => {
         expect(conditionNode.modifyValue).to.be.equal('2');
         expect(conditionNode.conditionOp).to.be.equal('!=');
         expect(conditionNode.conditionValue).to.be.equal('0');
+        expect(conditionNode.conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
     });
 
     it('should check weather or not the string is valid condition', () => {

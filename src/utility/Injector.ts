@@ -3,7 +3,8 @@ class Injector {
 
     private lazyInstancesFactory: { [key: string]: () => any } = {
         ServiceConfigSource: () => new (require('../lookup/FileServiceConfigSource')).default(),
-        ServiceLookup: () => new (require('../lookup/ServiceLookup')).default()
+        ServiceLookup: () => new (require('../lookup/ServiceLookup')).default(),
+        IdGenerator: () => new (require('./IdGenerator')).default()
     }
 
     public get<T>(name: string): T {
