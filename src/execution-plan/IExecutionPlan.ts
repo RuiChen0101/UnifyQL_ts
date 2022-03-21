@@ -1,6 +1,6 @@
 export default interface IExecutionPlan {
-    select: string,
-    from: string[],
+    query: string,
+    with: string[],
     link: string[],
     where: string,
     dependency: { [key: string]: IExecutionPlan }

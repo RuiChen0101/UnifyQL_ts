@@ -36,16 +36,14 @@ describe('ExecutionPlanGenerator', () => {
 
         expect(executionPlan).to.be.deep.equal({
             "dependency": {},
-            "from": [
-                "tableA"
-            ],
+            "with": [],
             "link": [],
-            "select": "tableA",
+            "query": "tableA",
             "where": "tableA.fieldA != 0"
         });
     });
 
-    it('should generate execution plan for condition and relation from the same service', () => {
+    it('should generate execution plan for condition and relation with the same service', () => {
         const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
@@ -69,18 +67,17 @@ describe('ExecutionPlanGenerator', () => {
 
         expect(executionPlan).to.be.deep.equal({
             "dependency": {},
-            "from": [
+            "with": [
                 "tableC",
-                "tableB",
-                "tableA"
+                "tableB"
             ],
             "link": ['tableC.fieldC=tableB.fieldB1', 'tableB.fieldB2=tableA.fieldA2'],
-            "select": "tableA",
+            "query": "tableA",
             "where": "(tableC.fieldC1 & 2) != 0"
         });
     });
 
-    it('should generate execution plan for condition and relation from the different service', () => {
+    it('should generate execution plan for condition and relation with the different service', () => {
         when(mockIdGenerator.nano8()).thenReturn('12345678');
         const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
             'tableA',
@@ -107,19 +104,15 @@ describe('ExecutionPlanGenerator', () => {
             "dependency": {
                 "12345678": {
                     "dependency": {},
-                    "from": [
-                        "tableD"
-                    ],
+                    "with": [],
                     "link": [],
-                    "select": "tableD.fieldD",
+                    "query": "tableD.fieldD",
                     "where": "tableD.fieldD1 != 0"
                 }
             },
-            "from": [
-                "tableA"
-            ],
+            "with": [],
             "link": [],
-            "select": "tableA",
+            "query": "tableA",
             "where": "tableA.fieldA1 IN {12345678}"
         });
     });
@@ -153,35 +146,30 @@ describe('ExecutionPlanGenerator', () => {
                     "dependency": {
                         "12345678": {
                             "dependency": {},
-                            "from": [
-                                "tableC"
-                            ],
+                            "with": [],
                             "link": [],
-                            "select": "tableC.fieldC",
+                            "query": "tableC.fieldC",
                             "where": "tableC.fieldC1 != 0"
                         }
                     },
-                    "from": [
-                        "tableD"
-                    ],
+                    "with": [],
                     "link": [],
-                    "select": "tableD.fieldD1",
+                    "query": "tableD.fieldD1",
                     "where": "tableD.fieldD2 IN {12345678}"
                 }
             },
-            "from": [
+            "with": [
                 "tableB",
-                "tableA"
             ],
             "link": [
                 "tableB.fieldB2=tableA.fieldA2"
             ],
-            "select": "tableA",
+            "query": "tableA",
             "where": "tableB.fieldB1 IN {23456789}"
         });
     });
 
-    it('should generate execution plan for expression tree from the same service', () => {
+    it('should generate execution plan for expression tree with the same service', () => {
         const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
@@ -205,21 +193,20 @@ describe('ExecutionPlanGenerator', () => {
 
         expect(executionPlan).to.be.deep.equal({
             "dependency": {},
-            "from": [
-                "tableB",
+            "with": [
                 "tableC",
-                "tableA"
+                "tableB"
             ],
             "link": [
                 "tableC.fieldC=tableB.fieldB1",
                 "tableB.fieldB2=tableA.fieldA2"
             ],
-            "select": "tableA",
+            "query": "tableA",
             "where": "(tableB.fieldB = 0 AND tableC.fieldC1 = 1)"
         });
     });
 
-    it('should generate execution plan for expression tree from the different service', () => {
+    it('should generate execution plan for expression tree with the different service', () => {
         when(mockIdGenerator.nano8()).thenReturn('12345678');
         const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
             'tableA',
@@ -246,22 +233,19 @@ describe('ExecutionPlanGenerator', () => {
             "dependency": {
                 "12345678": {
                     "dependency": {},
-                    "from": [
-                        "tableD"
-                    ],
+                    "with": [],
                     "link": [],
-                    "select": "tableD.fieldD",
+                    "query": "tableD.fieldD",
                     "where": "tableD.fieldD = 1"
                 }
             },
-            "from": [
-                "tableB",
-                "tableA"
+            "with": [
+                "tableB"
             ],
             "link": [
                 "tableB.fieldB2=tableA.fieldA2"
             ],
-            "select": "tableA",
+            "query": "tableA",
             "where": "(tableB.fieldB = 0 AND tableA.fieldA1 IN {12345678})"
         });
     });
@@ -293,16 +277,13 @@ describe('ExecutionPlanGenerator', () => {
             "dependency": {
                 "12345678": {
                     "dependency": {},
-                    "from": [
-                        "tableD"
-                    ],
+                    "with": [],
                     "link": [],
-                    "select": "tableD.fieldD",
+                    "query": "tableD.fieldD",
                     "where": "(tableD.fieldD1 = 0 AND tableD.fieldD2 = 1)"
                 }
             },
-            "from": [
-                "tableA",
+            "with": [
                 "tableC",
                 "tableB"
             ],
@@ -310,7 +291,7 @@ describe('ExecutionPlanGenerator', () => {
                 "tableC.fieldC=tableB.fieldB1",
                 "tableB.fieldB2=tableA.fieldA2"
             ],
-            "select": "tableA",
+            "query": "tableA",
             "where": "(tableA.fieldA1 IN {12345678} AND (tableC.fieldC1 = 2 OR tableB.fieldB = 3))"
         });
     });
@@ -342,25 +323,20 @@ describe('ExecutionPlanGenerator', () => {
             "dependency": {
                 "12345678": {
                     "dependency": {},
-                    "from": [
-                        "tableD"
-                    ],
+                    "with": [],
                     "link": [],
-                    "select": "tableD.fieldD",
+                    "query": "tableD.fieldD",
                     "where": "tableD.fieldD1 = 0"
                 },
                 "23456789": {
                     "dependency": {},
-                    "from": [
-                        "tableD"
-                    ],
+                    "with": [],
                     "link": [],
-                    "select": "tableD.fieldD",
+                    "query": "tableD.fieldD",
                     "where": "tableD.fieldD2 = 1"
                 }
             },
-            "from": [
-                "tableA",
+            "with": [
                 "tableC",
                 "tableB"
             ],
@@ -368,7 +344,7 @@ describe('ExecutionPlanGenerator', () => {
                 "tableC.fieldC=tableB.fieldB1",
                 "tableB.fieldB2=tableA.fieldA2"
             ],
-            "select": "tableA",
+            "query": "tableA",
             "where": "((tableA.fieldA1 IN {12345678} AND tableC.fieldC1 = 2) AND (tableA.fieldA1 IN {23456789} OR tableB.fieldB = 3))"
         });
     });

@@ -9,8 +9,8 @@ import IExpressionTreeNode from '../expression-tree/ExpressionTreeNode';
 import ExecutionPlanGeneratorException from '../exception/ExecutionPlanGeneratorException';
 
 interface InternalExecutionPlan {
-    select: string,
-    from: Set<string>,
+    query: string,
+    with: Set<string>,
     link: Set<string>,
     where: string,
     dependency: { [key: string]: IExecutionPlan }
@@ -39,8 +39,8 @@ class ExecutionPlanGenerator {
     public getExecutionPlan(): IExecutionPlan | undefined {
         if (this._executionPlan === undefined) return undefined;
         return {
-            select: this._executionPlan.select,
-            from: Array.from(this._executionPlan.from),
+            query: this._executionPlan.query,
+            with: Array.from(this._executionPlan.with),
             link: Array.from(this._executionPlan.link),
             where: this._executionPlan.where,
             dependency: this._executionPlan.dependency
@@ -62,8 +62,8 @@ class ExecutionPlanGenerator {
         const rightExecutionPlan = rightGenerator.getExecutionPlan()!;
 
         this._executionPlan = {
-            select: rootNode.outputTarget!,
-            from: new Set<string>([...leftExecutionPlan.from, ...rightExecutionPlan.from]),
+            query: rootNode.outputTarget!,
+            with: new Set<string>([...leftExecutionPlan.with, ...rightExecutionPlan.with]),
             link: new Set<string>([...leftExecutionPlan.link, ...rightExecutionPlan.link]),
             where: `(${leftExecutionPlan.where} ${rootNode.opType} ${rightExecutionPlan.where})`,
             dependency: { ...leftExecutionPlan.dependency, ...rightExecutionPlan.dependency }
@@ -75,8 +75,8 @@ class ExecutionPlanGenerator {
     private buildCondition(): string {
         const rootNode: ConditionNode = this._expressionTree as ConditionNode;
         this._executionPlan = {
-            select: rootNode.table,
-            from: new Set<string>([rootNode.table]),
+            query: rootNode.table,
+            with: new Set<string>([]),
             link: new Set<string>([]),
             where: rootNode.conditionStr,
             dependency: {}
@@ -91,18 +91,18 @@ class ExecutionPlanGenerator {
         const childExecutionPlan = generator.getExecutionPlan()!;
         if (injector.get<ServiceLookup>('ServiceLookup').isAllFromSameService([resultTable, rootNode.toTable])) {
             this._executionPlan = {
-                select: rootNode.toTable,
-                from: new Set<string>([...childExecutionPlan.from, rootNode.toTable]),
+                query: rootNode.toTable,
+                with: new Set<string>([...childExecutionPlan.with, childExecutionPlan.query]),
                 link: new Set<string>([...childExecutionPlan.link, `${rootNode.fromTable}.${rootNode.fromField}=${rootNode.toTable}.${rootNode.toField}`]),
                 where: childExecutionPlan.where,
                 dependency: childExecutionPlan.dependency
             };
         } else {
-            childExecutionPlan.select = `${rootNode.fromTable}.${rootNode.fromField}`;
+            childExecutionPlan.query = `${rootNode.fromTable}.${rootNode.fromField}`;
             const dependencyId = injector.get<IdGenerator>('IdGenerator').nano8();
             this._executionPlan = {
-                select: rootNode.toTable,
-                from: new Set<string>([rootNode.toTable]),
+                query: rootNode.toTable,
+                with: new Set<string>([]),
                 link: new Set<string>([]),
                 where: `${rootNode.toTable}.${rootNode.toField} IN {${dependencyId}}`,
                 dependency: {}
