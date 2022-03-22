@@ -83,7 +83,7 @@ class ExpressionTreeBuilder {
 
     private flush(): void {
         if (this._expressionTree === undefined) {
-            throw new ExpressionTreeBuildException('Bad state: dangling AND operator');
+            return;
         }
         while (this._nodeStack.length !== 0) {
             const stackTop: IExpressionTreeNode = this._nodeStack.pop()!;
@@ -101,9 +101,9 @@ class ExpressionTreeBuilder {
         }
     }
 
-    public getResult(): IExpressionTreeNode {
+    public getResult(): IExpressionTreeNode | undefined {
         this.flush();
-        return this._expressionTree!;
+        return this._expressionTree;
     }
 }
 

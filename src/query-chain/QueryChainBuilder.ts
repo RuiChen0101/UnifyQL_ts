@@ -39,6 +39,10 @@ class QueryChainBuilder {
         while (trackingTable.length !== 0) {
             const table: string = trackingTable.shift()!;
             const relation: { [key: string]: IQueryChainRelation } = this.completeRelationMap[table];
+            if (relation === undefined) {
+                visitedTable.push(table);
+                continue;
+            }
             const descendants: string[] = Object.keys(relation);
             let hasNewDescendant = false;
             for (const descendant of descendants) {
@@ -57,6 +61,10 @@ class QueryChainBuilder {
         while (trackingTable.length !== 0) {
             const table: string = trackingTable.shift()!;
             const relation: { [key: string]: IQueryChainRelation } = this.completeRelationMap[table];
+            if (relation === undefined) {
+                visitedTable.push(table);
+                continue;
+            }
             const descendants: string[] = Object.keys(relation);
             for (const descendant of descendants) {
                 if (visitedTable.includes(descendant)) continue;

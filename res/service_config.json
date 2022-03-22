@@ -1,12 +1,14 @@
 [
     {
         "serviceName": "userService",
+        "url": "http://localhost:5000/",
         "tables": [
             "user"
         ]
     },
     {
         "serviceName": "merchService",
+        "url": "http://localhost:4999/",
         "tables": [
             "merch_item",
             "merch_order"
@@ -14,6 +16,7 @@
     },
     {
         "serviceName": "logisticService",
+        "url": "http://localhost:4998/",
         "tables": [
             "logistic",
             "shipping_timeline",
@@ -22,6 +25,7 @@
     },
     {
         "serviceName": "paymentService",
+        "url": "http://localhost:4997/",
         "tables": [
             "payment"
         ]

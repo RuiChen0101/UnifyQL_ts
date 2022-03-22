@@ -4,6 +4,7 @@ import IdGenerator from '../utility/IdGenerator';
 import ServiceLookup from '../lookup/ServiceLookup';
 import RelationNode from '../expression-tree/RelationNode';
 import ConditionNode from '../expression-tree/ConditionNode';
+import OutputTargetNode from '../expression-tree/OutputTargetNode';
 import BinaryOperatorNode from '../expression-tree/BinaryOperatorNode';
 import IExpressionTreeNode from '../expression-tree/ExpressionTreeNode';
 import ExecutionPlanGeneratorException from '../exception/ExecutionPlanGeneratorException';
@@ -13,6 +14,8 @@ interface InternalExecutionPlan {
     with: Set<string>,
     link: Set<string>,
     where: string,
+    orderBy?: string[],
+    limit?: number[],
     dependency: { [key: string]: IExecutionPlan }
 }
 
@@ -31,6 +34,8 @@ class ExecutionPlanGenerator {
             return this.buildCondition();
         } else if (this._expressionTree instanceof RelationNode) {
             return this.buildRelation();
+        } else if (this._expressionTree instanceof OutputTargetNode) {
+            return this.buildOutputTargetNode();
         } else {
             throw new ExecutionPlanGeneratorException('Invalid expression tree');
         }
@@ -43,8 +48,43 @@ class ExecutionPlanGenerator {
             with: Array.from(this._executionPlan.with),
             link: Array.from(this._executionPlan.link),
             where: this._executionPlan.where,
+            orderBy: this._executionPlan.orderBy,
+            limit: this._executionPlan.limit,
             dependency: this._executionPlan.dependency
         }
+    }
+
+    private buildOutputTargetNode(): string {
+        const rootNode: OutputTargetNode = this._expressionTree as OutputTargetNode;
+        if (rootNode.leftNode === undefined) {
+            this._executionPlan = {
+                query: rootNode.outputTarget,
+                with: new Set<string>([]),
+                link: new Set<string>([]),
+                where: "",
+                orderBy: rootNode.orderBy,
+                limit: rootNode.limit,
+                dependency: {}
+            }
+
+            return rootNode.outputTarget;
+        }
+
+        const Generator = new ExecutionPlanGenerator(rootNode.leftNode!);
+        Generator.generate();
+        const executionPlan = Generator.getExecutionPlan()!;
+
+        this._executionPlan = {
+            query: executionPlan.query,
+            with: new Set<string>(executionPlan.with),
+            link: new Set<string>(executionPlan.link),
+            where: executionPlan.where,
+            orderBy: rootNode.orderBy,
+            limit: rootNode.limit,
+            dependency: executionPlan.dependency
+        }
+
+        return executionPlan.query;
     }
 
     private buildBinaryOperator(): string {

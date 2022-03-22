@@ -53,6 +53,22 @@ describe('QueryChainBuilder', () => {
         });
     });
 
+    it('should build query chain without with and link', () => {
+        const builder: QueryChainBuilder = new QueryChainBuilder(
+            'tableA',
+            [],
+            []
+        );
+
+        const queryChain = builder.build();
+
+        const forwardRelationMap = queryChain.forwardRelationMap;
+        expect(forwardRelationMap).to.be.deep.equal({});
+
+        const backwardRelationMap = queryChain.backwardRelationMap;
+        expect(backwardRelationMap).to.be.deep.equal({});
+    });
+
     it('should throw exception if using undefined table', () => {
         expect(function () {
             const builder: QueryChainBuilder = new QueryChainBuilder(

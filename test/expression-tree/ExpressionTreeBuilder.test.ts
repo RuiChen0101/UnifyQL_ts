@@ -9,7 +9,7 @@ describe('ExpressionTreeBuilder', () => {
     it('should build new condition node when first call buildCondition', () => {
         const builder: ExpressionTreeBuilder = new ExpressionTreeBuilder();
         builder.buildCondition('(tableB.fieldB & 2) != 0');
-        const expressionTree: IExpressionTreeNode = builder.getResult();
+        const expressionTree: IExpressionTreeNode = builder.getResult()!;
         expect((expressionTree as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
     });
 
@@ -17,7 +17,7 @@ describe('ExpressionTreeBuilder', () => {
         const builder: ExpressionTreeBuilder = new ExpressionTreeBuilder();
         builder.buildCondition('(tableB.fieldB & 2) != 0');
         builder.buildAnd();
-        const expressionTree: IExpressionTreeNode = builder.getResult();
+        const expressionTree: IExpressionTreeNode = builder.getResult()!;
         expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('AND');
         expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
     });
@@ -27,7 +27,7 @@ describe('ExpressionTreeBuilder', () => {
         builder.buildCondition('(tableB.fieldB & 2) != 0');
         builder.buildAnd();
         builder.buildCondition('tableA.fieldA IN ("0912","0934")');
-        const expressionTree: IExpressionTreeNode = builder.getResult();
+        const expressionTree: IExpressionTreeNode = builder.getResult()!;
         expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('AND');
         expect((expressionTree.rightNode as ConditionNode).conditionStr).to.be.equal('tableA.fieldA IN ("0912","0934")');
         expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
@@ -38,7 +38,7 @@ describe('ExpressionTreeBuilder', () => {
         builder.buildCondition('(tableB.fieldB & 2) != 0');
         builder.buildOr();
         builder.buildCondition('tableA.fieldA IN ("0912","0934")');
-        const expressionTree: IExpressionTreeNode = builder.getResult();
+        const expressionTree: IExpressionTreeNode = builder.getResult()!;
         expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('OR');
         expect((expressionTree.rightNode as ConditionNode).conditionStr).to.be.equal('tableA.fieldA IN ("0912","0934")');
         expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
@@ -51,7 +51,7 @@ describe('ExpressionTreeBuilder', () => {
         builder.buildCondition('tableA.fieldA IN ("0912","0934")');
         builder.buildAnd();
         builder.buildCondition('tableC.fieldC LIKE "O%"');
-        const expressionTree: IExpressionTreeNode = builder.getResult();
+        const expressionTree: IExpressionTreeNode = builder.getResult()!;
         expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('OR');
         expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
         const andNode: IExpressionTreeNode = expressionTree.rightNode!;
@@ -69,7 +69,7 @@ describe('ExpressionTreeBuilder', () => {
         builder.buildOr();
         builder.buildCondition('tableC.fieldC LIKE "O%"');
         builder.endBuildParentheses();
-        const expressionTree: IExpressionTreeNode = builder.getResult();
+        const expressionTree: IExpressionTreeNode = builder.getResult()!;
         expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('AND');
         expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
         const orNode: IExpressionTreeNode = expressionTree.rightNode!;
@@ -93,7 +93,7 @@ describe('ExpressionTreeBuilder', () => {
         builder.buildOr();
         builder.buildCondition('tableC.fieldC LIKE "O%"');
         builder.endBuildParentheses();
-        const expressionTree: IExpressionTreeNode = builder.getResult();
+        const expressionTree: IExpressionTreeNode = builder.getResult()!;
         expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('AND');
         expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
         const orNode: IExpressionTreeNode = expressionTree.rightNode!;

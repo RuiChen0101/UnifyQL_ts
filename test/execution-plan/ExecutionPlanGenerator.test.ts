@@ -12,7 +12,7 @@ import ExecutionPlanGenerator from '../../src/execution-plan/ExecutionPlanGenera
 const mockIdGenerator: IdGenerator = injector.get<IdGenerator>('MockIdGenerator');
 
 describe('ExecutionPlanGenerator', () => {
-    it('should generate execution plan for single condition', () => {
+    it('should generate execution plan for empty condition', () => {
         const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
@@ -20,13 +20,12 @@ describe('ExecutionPlanGenerator', () => {
         );
         const queryChain = queryChainBuilder.build();
 
-        const whereStr: string = 'tableA.fieldA != 0';
+        const whereStr: string = '';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse(whereStr);
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr, ['tableA.fieldA3 DESC'], [0, 100])!;
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
-        expander.finalize('tableA');
         const expandedTree = expander.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
@@ -38,6 +37,40 @@ describe('ExecutionPlanGenerator', () => {
             "dependency": {},
             "with": [],
             "link": [],
+            "orderBy": ['tableA.fieldA3 DESC'],
+            "limit": [0, 100],
+            "query": "tableA",
+            "where": ""
+        });
+    });
+
+    it('should generate execution plan for single condition', () => {
+        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+            'tableA',
+            ['tableB', 'tableC', 'tableD'],
+            ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
+        );
+        const queryChain = queryChainBuilder.build();
+
+        const whereStr: string = 'tableA.fieldA != 0';
+        const parser: ExpressionTreeParser = new ExpressionTreeParser();
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
+
+        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
+        expander.expand();
+        const expandedTree = expander.getResult();
+
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        generator.generate();
+
+        const executionPlan = generator.getExecutionPlan();
+
+        expect(executionPlan).to.be.deep.equal({
+            "dependency": {},
+            "with": [],
+            "link": [],
+            "orderBy": undefined,
+            "limit": undefined,
             "query": "tableA",
             "where": "tableA.fieldA != 0"
         });
@@ -53,11 +86,10 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = '(tableC.fieldC1 & 2) != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse(whereStr);
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
-        expander.finalize('tableA');
         const expandedTree = expander.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
@@ -72,6 +104,8 @@ describe('ExecutionPlanGenerator', () => {
                 "tableB"
             ],
             "link": ['tableC.fieldC=tableB.fieldB1', 'tableB.fieldB2=tableA.fieldA2'],
+            "orderBy": undefined,
+            "limit": undefined,
             "query": "tableA",
             "where": "(tableC.fieldC1 & 2) != 0"
         });
@@ -88,11 +122,10 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableD.fieldD1 != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse(whereStr);
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
-        expander.finalize('tableA');
         const expandedTree = expander.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
@@ -106,12 +139,16 @@ describe('ExecutionPlanGenerator', () => {
                     "dependency": {},
                     "with": [],
                     "link": [],
+                    "orderBy": undefined,
+                    "limit": undefined,
                     "query": "tableD.fieldD",
                     "where": "tableD.fieldD1 != 0"
                 }
             },
             "with": [],
             "link": [],
+            "orderBy": undefined,
+            "limit": undefined,
             "query": "tableA",
             "where": "tableA.fieldA1 IN {12345678}"
         });
@@ -128,11 +165,10 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableC.fieldC1 != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse(whereStr);
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
-        expander.finalize('tableA');
         const expandedTree = expander.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
@@ -148,12 +184,16 @@ describe('ExecutionPlanGenerator', () => {
                             "dependency": {},
                             "with": [],
                             "link": [],
+                            "orderBy": undefined,
+                            "limit": undefined,
                             "query": "tableC.fieldC",
                             "where": "tableC.fieldC1 != 0"
                         }
                     },
                     "with": [],
                     "link": [],
+                    "orderBy": undefined,
+                    "limit": undefined,
                     "query": "tableD.fieldD1",
                     "where": "tableD.fieldD2 IN {12345678}"
                 }
@@ -164,6 +204,8 @@ describe('ExecutionPlanGenerator', () => {
             "link": [
                 "tableB.fieldB2=tableA.fieldA2"
             ],
+            "orderBy": undefined,
+            "limit": undefined,
             "query": "tableA",
             "where": "tableB.fieldB1 IN {23456789}"
         });
@@ -179,11 +221,10 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableB.fieldB = 0 AND tableC.fieldC1 = 1';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse(whereStr);
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
-        expander.finalize('tableA');
         const expandedTree = expander.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
@@ -201,6 +242,8 @@ describe('ExecutionPlanGenerator', () => {
                 "tableC.fieldC=tableB.fieldB1",
                 "tableB.fieldB2=tableA.fieldA2"
             ],
+            "orderBy": undefined,
+            "limit": undefined,
             "query": "tableA",
             "where": "(tableB.fieldB = 0 AND tableC.fieldC1 = 1)"
         });
@@ -217,11 +260,10 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableB.fieldB = 0 AND tableD.fieldD = 1';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse(whereStr);
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
-        expander.finalize('tableA');
         const expandedTree = expander.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
@@ -235,6 +277,8 @@ describe('ExecutionPlanGenerator', () => {
                     "dependency": {},
                     "with": [],
                     "link": [],
+                    "orderBy": undefined,
+                    "limit": undefined,
                     "query": "tableD.fieldD",
                     "where": "tableD.fieldD = 1"
                 }
@@ -245,6 +289,8 @@ describe('ExecutionPlanGenerator', () => {
             "link": [
                 "tableB.fieldB2=tableA.fieldA2"
             ],
+            "orderBy": undefined,
+            "limit": undefined,
             "query": "tableA",
             "where": "(tableB.fieldB = 0 AND tableA.fieldA1 IN {12345678})"
         });
@@ -261,11 +307,10 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableD.fieldD1 = 0 AND tableD.fieldD2 = 1 AND (tableC.fieldC1 = 2 OR tableB.fieldB = 3)';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse(whereStr);
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
-        expander.finalize('tableA');
         const expandedTree = expander.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
@@ -279,6 +324,8 @@ describe('ExecutionPlanGenerator', () => {
                     "dependency": {},
                     "with": [],
                     "link": [],
+                    "orderBy": undefined,
+                    "limit": undefined,
                     "query": "tableD.fieldD",
                     "where": "(tableD.fieldD1 = 0 AND tableD.fieldD2 = 1)"
                 }
@@ -291,6 +338,8 @@ describe('ExecutionPlanGenerator', () => {
                 "tableC.fieldC=tableB.fieldB1",
                 "tableB.fieldB2=tableA.fieldA2"
             ],
+            "orderBy": undefined,
+            "limit": undefined,
             "query": "tableA",
             "where": "(tableA.fieldA1 IN {12345678} AND (tableC.fieldC1 = 2 OR tableB.fieldB = 3))"
         });
@@ -307,11 +356,10 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableD.fieldD1 = 0 AND tableC.fieldC1 = 2 AND (tableD.fieldD2 = 1 OR tableB.fieldB = 3)';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse(whereStr);
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr, ['tableA.fieldA3 DESC'], [0, 100])!;
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
-        expander.finalize('tableA');
         const expandedTree = expander.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
@@ -325,6 +373,8 @@ describe('ExecutionPlanGenerator', () => {
                     "dependency": {},
                     "with": [],
                     "link": [],
+                    "orderBy": undefined,
+                    "limit": undefined,
                     "query": "tableD.fieldD",
                     "where": "tableD.fieldD1 = 0"
                 },
@@ -332,6 +382,8 @@ describe('ExecutionPlanGenerator', () => {
                     "dependency": {},
                     "with": [],
                     "link": [],
+                    "orderBy": undefined,
+                    "limit": undefined,
                     "query": "tableD.fieldD",
                     "where": "tableD.fieldD2 = 1"
                 }
@@ -344,6 +396,8 @@ describe('ExecutionPlanGenerator', () => {
                 "tableC.fieldC=tableB.fieldB1",
                 "tableB.fieldB2=tableA.fieldA2"
             ],
+            "orderBy": ['tableA.fieldA3 DESC'],
+            "limit": [0, 100],
             "query": "tableA",
             "where": "((tableA.fieldA1 IN {12345678} AND tableC.fieldC1 = 2) AND (tableA.fieldA1 IN {23456789} OR tableB.fieldB = 3))"
         });

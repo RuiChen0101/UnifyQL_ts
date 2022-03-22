@@ -1,8 +1,7 @@
-import injector from "../utility/Injector";
 import QueryChain from "../query-chain/QueryChain";
-import ServiceLookup from "../lookup/ServiceLookup";
 import RelationNode from "../expression-tree/RelationNode";
 import ConditionNode from "../expression-tree/ConditionNode";
+import OutputTargetNode from "../expression-tree/OutputTargetNode";
 import IQueryChainRelation from "../query-chain/IQueryChainRelation";
 import BinaryOperatorNode from "../expression-tree/BinaryOperatorNode";
 import IExpressionTreeNode from "../expression-tree/ExpressionTreeNode";
@@ -26,7 +25,7 @@ class RelationExpander {
         return this._resultTable;
     }
 
-    public finalize(target: string): void {
+    private finalize(target: string): void {
         if (target === this._resultTable) {
             return;
         }
@@ -47,6 +46,15 @@ class RelationExpander {
         const rootNode = this._expressionTree;
         if (rootNode instanceof ConditionNode) {
             return (rootNode as ConditionNode).table;
+        }
+
+        if (rootNode instanceof OutputTargetNode) {
+            if (rootNode.leftNode === undefined) return rootNode.outputTarget;
+            const expander = new RelationExpander(rootNode.leftNode!, this._queryChain);
+            expander.expand();
+            expander.finalize(rootNode.outputTarget);
+            rootNode.setLeftNode(expander.getResult());
+            return rootNode.outputTarget;
         }
 
         let leftNodeResultTable: string;
