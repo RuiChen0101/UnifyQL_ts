@@ -1,6 +1,7 @@
 import 'mocha';
 import { expect } from 'chai';
 import { reset, when } from 'ts-mockito';
+
 import injector from '../../src/utility/Injector';
 import IdGenerator from '../../src/utility/IdGenerator';
 import QueryChainBuilder from '../../src/query-chain/QueryChainBuilder';
@@ -22,7 +23,7 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = '';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr, ['tableA.fieldA3 DESC'], [0, 100])!;
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr, ['tableA.fieldA3 DESC'], [0, 100]);
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
@@ -54,7 +55,7 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableA.fieldA != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
@@ -86,7 +87,7 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = '(tableC.fieldC1 & 2) != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
@@ -122,7 +123,7 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableD.fieldD1 != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
@@ -165,7 +166,7 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableC.fieldC1 != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
@@ -221,7 +222,7 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableB.fieldB = 0 AND tableC.fieldC1 = 1';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
@@ -260,7 +261,7 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableB.fieldB = 0 AND tableD.fieldD = 1';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
@@ -307,7 +308,7 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableD.fieldD1 = 0 AND tableD.fieldD2 = 1 AND (tableC.fieldC1 = 2 OR tableB.fieldB = 3)';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();
@@ -356,7 +357,7 @@ describe('ExecutionPlanGenerator', () => {
 
         const whereStr: string = 'tableD.fieldD1 = 0 AND tableC.fieldC1 = 2 AND (tableD.fieldD2 = 1 OR tableB.fieldB = 3)';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr, ['tableA.fieldA3 DESC'], [0, 100])!;
+        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr, ['tableA.fieldA3 DESC'], [0, 100]);
 
         const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
         expander.expand();

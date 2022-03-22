@@ -1,7 +1,7 @@
 [
     {
         "serviceName": "aService",
-        "url": "http://localhost:5000/",
+        "url": "http://localhost:5000",
         "tables": [
             "tableA",
             "tableB",
@@ -10,7 +10,7 @@
     },
     {
         "serviceName": "bService",
-        "url": "http://localhost:4999/",
+        "url": "http://localhost:4999",
         "tables": [
             "tableD",
             "tableE",
