@@ -12,10 +12,10 @@ class ExecutionPlanUQLConverter {
         if (plan.where !== '') {
             result.push(`WHERE ${this.replaceDependency(plan.where, dependency)}`);
         }
-        if (plan.orderBy !== undefined) {
+        if (plan.orderBy !== undefined && plan.orderBy.length !== 0) {
             result.push(`ORDER BY ${plan.orderBy.join(',')}`);
         }
-        if (plan.limit !== undefined) {
+        if (plan.limit !== undefined && plan.limit.length !== 0) {
             result.push(`LIMIT ${plan.limit[0]}, ${plan.limit[1]}`);
         }
         return result.join(' ');

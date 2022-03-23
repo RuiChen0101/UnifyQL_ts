@@ -1,16 +1,16 @@
 import 'mocha';
 import { expect } from 'chai';
+import { reset, when } from 'ts-mockito';
 import * as MockFetch from '../test-data/MockFetchProxy';
 
 import injector from '../../src/utility/Injector';
 import IdGenerator from '../../src/utility/IdGenerator';
+import PlanExecutor from '../../src/plan-executor/PlanExecutor';
 import QueryChainBuilder from '../../src/query-chain/QueryChainBuilder';
 import RelationExpander from '../../src/relation-expand/RelationExpander';
 import IExpressionTreeNode from '../../src/expression-tree/ExpressionTreeNode';
 import ExpressionTreeParser from '../../src/expression-tree/ExpressionTreeParser';
 import ExecutionPlanGenerator from '../../src/execution-plan/ExecutionPlanGenerator';
-import PlanExecutor from '../../src/plan-executor/PlanExecutor';
-import { reset, when } from 'ts-mockito';
 
 const mockIdGenerator: IdGenerator = injector.get<IdGenerator>('MockIdGenerator');
 
