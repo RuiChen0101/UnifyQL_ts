@@ -1,4 +1,4 @@
-import IServiceConfig from '../data-model/IServiceConfig';
+import IServiceConfig from "../service-config/IServiceConfig";
 
 export default interface IServiceLookup {
     getServiceConfig(serviceName: string): IServiceConfig;

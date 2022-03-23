@@ -10,10 +10,11 @@
     "types": "./lib/src/index.d.ts",
     "exports": {
         ".": "./lib/src/index.js",
-        "./converter": "./lib/src/converter/index.js"
+        "./converter": "./lib/src/converter/index.js",
+        "./service-config": "./lib/src/service-config/index.js"
     },
     "scripts": {
-        "build": "tsc",
+        "build": "tsc --build --clean && tsc",
         "test": "mocha -r ts-node/register -r test/init.test.ts 'test/**/*.test.ts' --exit --recursive",
         "test-coverage": "nyc --reporter=text mocha -r ts-node/register -r test/init.test.ts 'test/**/*.test.ts' --exit --recursive"
     },

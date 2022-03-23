@@ -1,4 +1,4 @@
-import IServiceConfig from "../data-model/IServiceConfig";
+import IServiceConfig from "./IServiceConfig";
 
 export default interface IServiceConfigSource {
     getServiceConfigs(): { [key: string]: IServiceConfig };

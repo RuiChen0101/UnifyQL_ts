@@ -3,11 +3,13 @@ import { expect } from 'chai';
 import { reset, when } from 'ts-mockito';
 import * as MockFetch from '../test-data/MockFetchProxy';
 
+import UnifyQL from '../../src/unify-ql/UnifyQL';
 import injector from '../../src/utility/Injector';
 import IdGenerator from '../../src/utility/IdGenerator';
-import UnifyQL from '../../src/unify-ql/UnifyQL';
+import IServiceConfigSource from '../../src/service-config/IServiceConfigSource';
 
 const mockIdGenerator: IdGenerator = injector.get<IdGenerator>('MockIdGenerator');
+const serviceConfigSource = injector.get<IServiceConfigSource>('ServiceConfigSource');
 
 describe('UnifyQL', () => {
     it('should execute query without any condition', async () => {
@@ -15,7 +17,7 @@ describe('UnifyQL', () => {
 
         const uqlStr = 'QUERY tableA';
 
-        const unifyQL = new UnifyQL();
+        const unifyQL = new UnifyQL(serviceConfigSource);
         const result = await unifyQL.query(uqlStr);
 
         expect(result).to.be.deep.equal([{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
@@ -31,7 +33,7 @@ describe('UnifyQL', () => {
 
         const uqlStr = 'QUERY tableA.fieldA';
 
-        const unifyQL = new UnifyQL();
+        const unifyQL = new UnifyQL(serviceConfigSource);
         const result = await unifyQL.query(uqlStr);
 
         expect(result).to.be.deep.equal([{ fieldA: 'fieldA' }]);
@@ -47,7 +49,7 @@ describe('UnifyQL', () => {
 
         const uqlStr = 'QUERY tableA ORDER BY tableA.fieldA3 DESC LIMIT 0,100';
 
-        const unifyQL = new UnifyQL();
+        const unifyQL = new UnifyQL(serviceConfigSource);
         const result = await unifyQL.query(uqlStr);
 
         expect(result).to.be.deep.equal([{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
@@ -63,7 +65,7 @@ describe('UnifyQL', () => {
 
         const uqlStr = 'QUERY tableA WITH tableB, tableC LINK tableC.fieldC=tableB.fieldB1,tableA.fieldA2=tableB.fieldB2 WHERE (tableC.fieldC1 & 2) != 0';
 
-        const unifyQL = new UnifyQL();
+        const unifyQL = new UnifyQL(serviceConfigSource);
         const result = await unifyQL.query(uqlStr);
 
         expect(result).to.be.deep.equal([{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
@@ -81,7 +83,7 @@ describe('UnifyQL', () => {
 
         const uqlStr = 'QUERY tableA WITH tableB, tableC, tableD LINK tableC.fieldC=tableB.fieldB1,tableD.fieldD=tableA.fieldA1,tableA.fieldA2=tableB.fieldB2 WHERE tableD.fieldD1 != 0';
 
-        const unifyQL = new UnifyQL();
+        const unifyQL = new UnifyQL(serviceConfigSource);
         const result = await unifyQL.query(uqlStr);
 
         expect(result).to.be.deep.equal([{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
@@ -104,7 +106,7 @@ describe('UnifyQL', () => {
 
         const uqlStr = 'QUERY tableA WITH tableB, tableC, tableD LINK tableC.fieldC=tableD.fieldD2, tableD.fieldD1=tableB.fieldB1, tableA.fieldA2=tableB.fieldB2 WHERE tableC.fieldC1 != 0';
 
-        const unifyQL = new UnifyQL();
+        const unifyQL = new UnifyQL(serviceConfigSource);
         const result = await unifyQL.query(uqlStr);
 
         expect(result).to.be.deep.equal([{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
@@ -131,7 +133,7 @@ describe('UnifyQL', () => {
 
         const uqlStr = 'QUERY tableA WITH tableB, tableC, tableD LINK tableC.fieldC=tableB.fieldB1,tableD.fieldD=tableA.fieldA1,tableA.fieldA2=tableB.fieldB2 WHERE tableD.fieldD1 = 0 AND tableC.fieldC1 = 2 AND (tableD.fieldD2 = 1 OR tableB.fieldB = 3) ORDER BY tableA.tableA3 ASC LIMIT 10, 100';
 
-        const unifyQL = new UnifyQL();
+        const unifyQL = new UnifyQL(serviceConfigSource);
         const result = await unifyQL.query(uqlStr);
 
         expect(result).to.be.deep.equal([{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);

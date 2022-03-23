@@ -1,7 +1,7 @@
 import injector from '../utility/Injector';
 import IServiceLookup from './IServiceLookup';
-import IServiceConfig from '../data-model/IServiceConfig';
-import IServiceConfigSource from './IServiceConfigSource';
+import IServiceConfig from '../service-config/IServiceConfig';
+import IServiceConfigSource from '../service-config/IServiceConfigSource';
 
 class ServiceLookup implements IServiceLookup {
 

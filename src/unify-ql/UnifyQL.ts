@@ -1,16 +1,20 @@
 import IUnifyQL from "./IUnifyQL";
 
+import injector from "../utility/Injector";
 import PlanExecutor from "../plan-executor/PlanExecutor";
 import QueryChainBuilder from "../query-chain/QueryChainBuilder";
 import RelationExpander from "../relation-expand/RelationExpander";
 import IExpressionTreeNode from "../expression-tree/ExpressionTreeNode";
 import extractQLElement from "../unify-ql-element/ExtractUnifyQlElement";
+import IServiceConfigSource from "../service-config/IServiceConfigSource";
 import ExpressionTreeParser from "../expression-tree/ExpressionTreeParser";
 import ExecutionPlanGenerator from "../execution-plan/ExecutionPlanGenerator";
 
 class UnifyQL implements IUnifyQL {
 
-    constructor() { }
+    constructor(serviceConfigSource: IServiceConfigSource) {
+        injector.set('ServiceConfigSource', serviceConfigSource);
+    }
 
     public async query(unifyQl: string): Promise<any> {
         const element = extractQLElement(unifyQl);

@@ -1,12 +1,15 @@
-import IServiceConfig from '../data-model/IServiceConfig';
+import * as fs from 'fs';
+
+import IServiceConfig from './IServiceConfig';
 import IServiceConfigSource from './IServiceConfigSource';
 
 class FileServiceConfigSource implements IServiceConfigSource {
     private serviceConfigs: { [key: string]: IServiceConfig } = {};
     private tableMapping: { [key: string]: string } = {};
 
-    constructor(fileName: string = '../../res/service_config.json') {
-        const fileConfigs: IServiceConfig[] = require(fileName);
+    constructor(fileName: string) {
+        const fileData = fs.readFileSync(fileName, 'utf8');
+        const fileConfigs: IServiceConfig[] = JSON.parse(fileData);
         for (const fileConfig of fileConfigs) {
             const serviceName: string = fileConfig.serviceName;
             this.serviceConfigs[serviceName] = fileConfig;

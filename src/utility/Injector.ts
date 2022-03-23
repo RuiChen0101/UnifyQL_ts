@@ -2,7 +2,6 @@ class Injector {
     private instancesPool: { [key: string]: any } = {}
 
     private lazyInstancesFactory: { [key: string]: () => any } = {
-        ServiceConfigSource: () => new (require('../lookup/FileServiceConfigSource')).default(),
         ServiceLookup: () => new (require('../lookup/ServiceLookup')).default(),
         IdGenerator: () => new (require('./IdGenerator')).default(),
         FetchProxy: () => new (require('./FetchProxy')).default()
