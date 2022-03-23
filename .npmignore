@@ -1,0 +1,7 @@
+.nyc_output/
+tsconfig.json
+src/
+test/
+build/test/
+*.md
+*.yml

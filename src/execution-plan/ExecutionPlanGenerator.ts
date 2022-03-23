@@ -75,7 +75,7 @@ class ExecutionPlanGenerator {
         const executionPlan = Generator.getExecutionPlan()!;
 
         this._executionPlan = {
-            query: executionPlan.query,
+            query: rootNode.outputTarget,
             with: new Set<string>(executionPlan.with),
             link: new Set<string>(executionPlan.link),
             where: executionPlan.where,
@@ -84,7 +84,7 @@ class ExecutionPlanGenerator {
             dependency: executionPlan.dependency
         }
 
-        return executionPlan.query;
+        return rootNode.outputTarget.split('.')[0];
     }
 
     private buildBinaryOperator(): string {

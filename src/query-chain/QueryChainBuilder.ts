@@ -9,8 +9,8 @@ class QueryChainBuilder {
     private completeRelationMap: IQueryChainRelationMap = {};
 
     constructor(target: string, associationTables: string[], relations: string[]) {
-        let definedTables: string[] = [target, ...associationTables];
-        this.target = target;
+        this.target = target.split('.')[0];
+        let definedTables: string[] = [this.target, ...associationTables];
         for (const relation of relations) {
             const tableRelation: IQueryChainRelation = this.extractRelation(relation);
             if (!definedTables.includes(tableRelation.fromTable) || !definedTables.includes(tableRelation.toTable)) {

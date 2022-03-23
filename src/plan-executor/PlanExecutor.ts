@@ -52,7 +52,7 @@ class PlanExecutor {
 
         const data: any[] = (await res.json()) as any[];
 
-        if (targetField === undefined) {
+        if (targetField === undefined || this._id === 'root') {
             return {
                 id: this._id,
                 data: data

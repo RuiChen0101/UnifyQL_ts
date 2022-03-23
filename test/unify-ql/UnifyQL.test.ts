@@ -26,6 +26,22 @@ describe('UnifyQL', () => {
         expect(queryReq.reqOption.body).to.be.equal('QUERY tableA');
     });
 
+    it('should execute query with specify field', async () => {
+        MockFetch.setJsonResult(200, [{ fieldA: 'fieldA' }]);
+
+        const uqlStr = 'QUERY tableA.fieldA';
+
+        const unifyQL = new UnifyQL();
+        const result = await unifyQL.query(uqlStr);
+
+        expect(result).to.be.deep.equal([{ fieldA: 'fieldA' }]);
+
+        const queryReq = MockFetch.requests[0];
+
+        expect(queryReq.reqUrl).to.be.equal('http://localhost:5000/query');
+        expect(queryReq.reqOption.body).to.be.equal('QUERY tableA.fieldA');
+    });
+
     it('should execute query with orderBy and limit', async () => {
         MockFetch.setJsonResult(200, [{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
 
