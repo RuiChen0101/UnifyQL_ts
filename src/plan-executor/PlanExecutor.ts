@@ -39,8 +39,8 @@ class PlanExecutor {
         const converter = new ExecutionPlanUQLConverter();
         const uql = converter.convert(rootPlan, dependencyResult);
 
-        const res = await injector.get<FetchProxy>('FetchProxy').fetch(
-            `${requestUrl}/query`, {
+        const res = await injector.get<FetchProxy>('FetchProxy').fetch(requestUrl, {
+            method: 'POST',
             body: uql
         });
 
