@@ -15,6 +15,7 @@
     },
     "scripts": {
         "build": "tsc --build --clean && tsc",
+        "deploy": "npm run build && npm publish",
         "test": "mocha -r ts-node/register -r test/init.test.ts 'test/**/*.test.ts' --exit --recursive",
         "test-coverage": "nyc --reporter=text mocha -r ts-node/register -r test/init.test.ts 'test/**/*.test.ts' --exit --recursive"
     },
@@ -36,7 +37,6 @@
     "dependencies": {
         "abort-controller": "^3.0.0",
         "cors": "^2.8.5",
-        "express": "^4.17.3",
         "nanoid": "^3.3.1",
         "node-fetch": "^3.2.3"
     }
