@@ -1,6 +1,7 @@
 import IUnifyQL from "./IUnifyQL";
 
 import injector from "../utility/Injector";
+import ServiceLookup from "../lookup/ServiceLookup";
 import PlanExecutor from "../plan-executor/PlanExecutor";
 import QueryChainBuilder from "../query-chain/QueryChainBuilder";
 import RelationExpander from "../relation-expand/RelationExpander";
@@ -17,7 +18,8 @@ class UnifyQL implements IUnifyQL {
     }
 
     public async query(unifyQl: string): Promise<any> {
-        const element = extractQLElement(unifyQl);
+        const serviceLookup: ServiceLookup = new ServiceLookup();
+        const element = extractQLElement(unifyQl.replaceAll('\n', ' '));
         const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(element.queryTarget, element.with, element.link);
         const queryChain = queryChainBuilder.build();
 
@@ -28,12 +30,12 @@ class UnifyQL implements IUnifyQL {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan()!;
 
-        const executor = new PlanExecutor('root', executionPlan);
+        const executor = new PlanExecutor('root', executionPlan, serviceLookup);
         const result = await executor.execute();
 
         return result.data;

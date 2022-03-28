@@ -4,6 +4,7 @@ import { reset, when } from 'ts-mockito';
 
 import injector from '../../src/utility/Injector';
 import IdGenerator from '../../src/utility/IdGenerator';
+import ServiceLookup from '../../src/lookup/ServiceLookup';
 import QueryChainBuilder from '../../src/query-chain/QueryChainBuilder';
 import RelationExpander from '../../src/relation-expand/RelationExpander';
 import IExpressionTreeNode from '../../src/expression-tree/ExpressionTreeNode';
@@ -11,6 +12,8 @@ import ExpressionTreeParser from '../../src/expression-tree/ExpressionTreeParser
 import ExecutionPlanGenerator from '../../src/execution-plan/ExecutionPlanGenerator';
 
 const mockIdGenerator: IdGenerator = injector.get<IdGenerator>('MockIdGenerator');
+
+const serviceLookup: ServiceLookup = new ServiceLookup();
 
 describe('ExecutionPlanGenerator', () => {
     it('should generate execution plan for empty condition', () => {
@@ -29,7 +32,7 @@ describe('ExecutionPlanGenerator', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan();
@@ -61,7 +64,7 @@ describe('ExecutionPlanGenerator', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan();
@@ -93,7 +96,7 @@ describe('ExecutionPlanGenerator', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan();
@@ -129,7 +132,7 @@ describe('ExecutionPlanGenerator', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan();
@@ -172,7 +175,7 @@ describe('ExecutionPlanGenerator', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan();
@@ -228,7 +231,7 @@ describe('ExecutionPlanGenerator', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan();
@@ -267,7 +270,7 @@ describe('ExecutionPlanGenerator', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan();
@@ -314,7 +317,7 @@ describe('ExecutionPlanGenerator', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan();
@@ -363,7 +366,7 @@ describe('ExecutionPlanGenerator', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan();

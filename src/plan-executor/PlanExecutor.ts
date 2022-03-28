@@ -9,10 +9,12 @@ import PlanExecutorException from "../exception/PlanExecutorException";
 class PlanExecutor {
     private _id: string;
     private _executionPlan: IExecutionPlan;
+    private _serviceLookup: ServiceLookup;
 
-    constructor(id: string, executionPlan: IExecutionPlan) {
+    constructor(id: string, executionPlan: IExecutionPlan, serviceLookup: ServiceLookup) {
         this._id = id;
         this._executionPlan = executionPlan;
+        this._serviceLookup = serviceLookup;
     }
 
     public async execute(): Promise<IExecutionResult> {
@@ -22,7 +24,7 @@ class PlanExecutor {
         if (dependencyIds.length !== 0) {
             const executionPromises: Promise<IExecutionResult>[] = [];
             for (const dependencyId of dependencyIds) {
-                const executor = new PlanExecutor(dependencyId, rootPlan.dependency[dependencyId]);
+                const executor = new PlanExecutor(dependencyId, rootPlan.dependency[dependencyId], this._serviceLookup);
                 executionPromises.push(executor.execute());
             }
             const results: IExecutionResult[] = await Promise.all(executionPromises);
@@ -33,8 +35,8 @@ class PlanExecutor {
         const splitQuery = rootPlan.query.split('.');
         const targetTable = splitQuery[0];
         const targetField: string | undefined = splitQuery[1];
-        const serviceName: string = injector.get<ServiceLookup>('ServiceLookup').getServiceNameByTable(targetTable);
-        const requestUrl: string = injector.get<ServiceLookup>('ServiceLookup').getServiceConfig(serviceName).url;
+        const serviceName: string = this._serviceLookup.getServiceNameByTable(targetTable);
+        const requestUrl: string = this._serviceLookup.getServiceConfig(serviceName).url;
 
         const converter = new ExecutionPlanUQLConverter();
         const uql = converter.convert(rootPlan, dependencyResult);

@@ -1,9 +1,8 @@
 import injector from '../utility/Injector';
-import IServiceLookup from './IServiceLookup';
 import IServiceConfig from '../service-config/IServiceConfig';
 import IServiceConfigSource from '../service-config/IServiceConfigSource';
 
-class ServiceLookup implements IServiceLookup {
+class ServiceLookup {
 
     private serviceConfigSource: IServiceConfigSource = injector.get<IServiceConfigSource>('ServiceConfigSource');
 

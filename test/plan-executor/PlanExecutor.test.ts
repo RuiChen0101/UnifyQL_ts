@@ -5,6 +5,7 @@ import * as MockFetch from '../test-data/MockFetchProxy';
 
 import injector from '../../src/utility/Injector';
 import IdGenerator from '../../src/utility/IdGenerator';
+import ServiceLookup from '../../src/lookup/ServiceLookup';
 import PlanExecutor from '../../src/plan-executor/PlanExecutor';
 import QueryChainBuilder from '../../src/query-chain/QueryChainBuilder';
 import RelationExpander from '../../src/relation-expand/RelationExpander';
@@ -13,6 +14,7 @@ import ExpressionTreeParser from '../../src/expression-tree/ExpressionTreeParser
 import ExecutionPlanGenerator from '../../src/execution-plan/ExecutionPlanGenerator';
 
 const mockIdGenerator: IdGenerator = injector.get<IdGenerator>('MockIdGenerator');
+const serviceLookup: ServiceLookup = new ServiceLookup();
 
 describe('PlanExecutor', () => {
     it('should execute query with no condition', async () => {
@@ -32,12 +34,12 @@ describe('PlanExecutor', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan()!;
 
-        const executor = new PlanExecutor('root', executionPlan);
+        const executor = new PlanExecutor('root', executionPlan, serviceLookup);
         const result = await executor.execute();
 
         expect(result.id).to.be.equal('root');
@@ -66,12 +68,12 @@ describe('PlanExecutor', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan()!;
 
-        const executor = new PlanExecutor('root', executionPlan);
+        const executor = new PlanExecutor('root', executionPlan, serviceLookup);
         const result = await executor.execute();
 
         expect(result.id).to.be.equal('root');
@@ -101,12 +103,12 @@ describe('PlanExecutor', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan()!;
 
-        const executor = new PlanExecutor('root', executionPlan);
+        const executor = new PlanExecutor('root', executionPlan, serviceLookup);
         const result = await executor.execute();
 
         expect(result.id).to.be.equal('root');
@@ -142,12 +144,12 @@ describe('PlanExecutor', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan()!;
 
-        const executor = new PlanExecutor('root', executionPlan);
+        const executor = new PlanExecutor('root', executionPlan, serviceLookup);
         const result = await executor.execute();
 
         expect(result.id).to.be.equal('root');
@@ -187,12 +189,12 @@ describe('PlanExecutor', () => {
         expander.expand();
         const expandedTree = expander.getResult();
 
-        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree);
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
 
         const executionPlan = generator.getExecutionPlan()!;
 
-        const executor = new PlanExecutor('root', executionPlan);
+        const executor = new PlanExecutor('root', executionPlan, serviceLookup);
         const result = await executor.execute();
 
         expect(result.id).to.be.equal('root');

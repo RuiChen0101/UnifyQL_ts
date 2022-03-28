@@ -20,11 +20,13 @@ interface InternalExecutionPlan {
 }
 
 class ExecutionPlanGenerator {
+    private _serviceLookup: ServiceLookup;
     private _expressionTree: IExpressionTreeNode;
     private _executionPlan?: InternalExecutionPlan;
 
-    constructor(expressionTree: IExpressionTreeNode) {
+    constructor(expressionTree: IExpressionTreeNode, serviceLookup: ServiceLookup) {
         this._expressionTree = expressionTree;
+        this._serviceLookup = serviceLookup;
     }
 
     public generate(): string {
@@ -70,7 +72,7 @@ class ExecutionPlanGenerator {
             return rootNode.outputTarget;
         }
 
-        const Generator = new ExecutionPlanGenerator(rootNode.leftNode!);
+        const Generator = new ExecutionPlanGenerator(rootNode.leftNode!, this._serviceLookup);
         Generator.generate();
         const executionPlan = Generator.getExecutionPlan()!;
 
@@ -93,11 +95,11 @@ class ExecutionPlanGenerator {
             throw new ExecutionPlanGeneratorException('Invalid expression tree');
         }
 
-        const leftGenerator = new ExecutionPlanGenerator(rootNode.leftNode);
+        const leftGenerator = new ExecutionPlanGenerator(rootNode.leftNode, this._serviceLookup);
         leftGenerator.generate();
         const leftExecutionPlan = leftGenerator.getExecutionPlan()!;
 
-        const rightGenerator = new ExecutionPlanGenerator(rootNode.rightNode);
+        const rightGenerator = new ExecutionPlanGenerator(rootNode.rightNode, this._serviceLookup);
         rightGenerator.generate();
         const rightExecutionPlan = rightGenerator.getExecutionPlan()!;
 
@@ -126,10 +128,10 @@ class ExecutionPlanGenerator {
 
     private buildRelation(): string {
         const rootNode: RelationNode = this._expressionTree as RelationNode;
-        const generator = new ExecutionPlanGenerator(rootNode.leftNode!);
+        const generator = new ExecutionPlanGenerator(rootNode.leftNode!, this._serviceLookup);
         const resultTable = generator.generate();
         const childExecutionPlan = generator.getExecutionPlan()!;
-        if (injector.get<ServiceLookup>('ServiceLookup').isAllFromSameService([resultTable, rootNode.toTable])) {
+        if (this._serviceLookup.isAllFromSameService([resultTable, rootNode.toTable])) {
             this._executionPlan = {
                 query: rootNode.toTable,
                 with: new Set<string>([...childExecutionPlan.with, childExecutionPlan.query]),
