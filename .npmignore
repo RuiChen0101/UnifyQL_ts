@@ -3,5 +3,6 @@ tsconfig.json
 src/
 test/
 lib/test/
+.env
 *.md
 *.yml

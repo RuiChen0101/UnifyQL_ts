@@ -1,6 +1,6 @@
 {
     "name": "unify-ql",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "repository": {
         "type": "git",
         "url": "https://github.com/RuiChen0101/UnifyQL_ts.git"
@@ -8,10 +8,26 @@
     "description": "Unified Query Language for complex discrete system",
     "main": "./lib/src/index.js",
     "types": "./lib/src/index.d.ts",
+    "typesVersions": {
+        "*": {
+            "converter": [
+                "lib/src/converter"
+            ],
+            "service-config": [
+                "lib/src/service-config"
+            ]
+        }
+    },
     "exports": {
         ".": "./lib/src/index.js",
-        "./converter": "./lib/src/converter/index.js",
-        "./service-config": "./lib/src/service-config/index.js"
+        "./converter": {
+            "require": "./lib/src/converter/index.js",
+            "import": "./lib/src/converter/index.js"
+        },
+        "./service-config": {
+            "require": "./lib/src/service-config/index.js",
+            "import": "./lib/src/service-config/index.js"
+        }
     },
     "scripts": {
         "build": "tsc --build --clean && tsc",
