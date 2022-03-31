@@ -26,6 +26,7 @@ describe('RelationExpander', () => {
         expect(resultTable).to.be.equal('tableA');
         expect(resultTree).to.be.deep.equal({
             "_leftNode": undefined,
+            "_rightNode": undefined,
             "limit": [0, 100],
             "orderBy": ['tableA.fieldA3 DESC'],
             "outputTarget": "tableA"
@@ -54,6 +55,8 @@ describe('RelationExpander', () => {
             "_leftNode": {
                 "_leftNode": {
                     "_leftNode": {
+                        "_leftNode": undefined,
+                        "_rightNode": undefined,
                         "conditionOp": "!=",
                         "conditionStr": "(tableC.fieldC1 & 2) != 0",
                         "conditionValue": "0",
@@ -62,16 +65,19 @@ describe('RelationExpander', () => {
                         "modifyValue": "2",
                         "table": "tableC",
                     },
+                    "_rightNode": undefined,
                     "fromField": "fieldC",
                     "fromTable": "tableC",
                     "toField": "fieldB1",
                     "toTable": "tableB",
                 },
+                "_rightNode": undefined,
                 "fromField": "fieldB2",
                 "fromTable": "tableB",
                 "toField": "fieldA2",
                 "toTable": "tableA",
             },
+            "_rightNode": undefined,
             "limit": [0, 100],
             "orderBy": ['tableA.fieldA3 DESC'],
             "outputTarget": "tableA"
@@ -99,6 +105,8 @@ describe('RelationExpander', () => {
         expect(resultTree).to.be.deep.equal({
             "_leftNode": {
                 "_leftNode": {
+                    "_leftNode": undefined,
+                    "_rightNode": undefined,
                     "conditionOp": "=",
                     "conditionStr": "tableA.fieldA = 0",
                     "conditionValue": "0",
@@ -109,6 +117,8 @@ describe('RelationExpander', () => {
                 },
                 "_rightNode": {
                     "_leftNode": {
+                        "_leftNode": undefined,
+                        "_rightNode": undefined,
                         "conditionOp": "=",
                         "conditionStr": "tableD.fieldD1 = 1",
                         "conditionValue": "1",
@@ -117,6 +127,7 @@ describe('RelationExpander', () => {
                         "modifyValue": undefined,
                         "table": "tableD",
                     },
+                    "_rightNode": undefined,
                     "fromField": "fieldD",
                     "fromTable": "tableD",
                     "toField": "fieldA1",
@@ -125,6 +136,7 @@ describe('RelationExpander', () => {
                 "_outputTarget": "tableA",
                 "opType": "AND",
             },
+            "_rightNode": undefined,
             "limit": undefined,
             "orderBy": undefined,
             "outputTarget": "tableA"
@@ -154,6 +166,8 @@ describe('RelationExpander', () => {
                 "_leftNode": {
                     "_leftNode": {
                         "_leftNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableC.fieldC1 = 0",
                             "conditionValue": "0",
@@ -162,8 +176,9 @@ describe('RelationExpander', () => {
                             "modifyValue": undefined,
                             "table": "tableC",
                         },
-                        "_outputTarget": "tableC",
                         "_rightNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableC.fieldC2 = 1",
                             "conditionValue": "1",
@@ -172,18 +187,22 @@ describe('RelationExpander', () => {
                             "modifyValue": undefined,
                             "table": "tableC",
                         },
+                        "_outputTarget": "tableC",
                         "opType": "AND",
                     },
+                    "_rightNode": undefined,
                     "fromField": "fieldC",
                     "fromTable": "tableC",
                     "toField": "fieldB1",
                     "toTable": "tableB",
                 },
+                "_rightNode": undefined,
                 "fromField": "fieldB2",
                 "fromTable": "tableB",
                 "toField": "fieldA2",
                 "toTable": "tableA",
             },
+            "_rightNode": undefined,
             "limit": undefined,
             "orderBy": undefined,
             "outputTarget": "tableA",
@@ -212,6 +231,8 @@ describe('RelationExpander', () => {
             "_leftNode": {
                 "_leftNode": {
                     "_leftNode": {
+                        "_leftNode": undefined,
+                        "_rightNode": undefined,
                         "conditionOp": "=",
                         "conditionStr": "tableB.fieldB = 0",
                         "conditionValue": "0",
@@ -222,6 +243,8 @@ describe('RelationExpander', () => {
                     },
                     "_rightNode": {
                         "_leftNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableC.fieldC1 = 1",
                             "conditionValue": "1",
@@ -230,6 +253,7 @@ describe('RelationExpander', () => {
                             "modifyValue": undefined,
                             "table": "tableC",
                         },
+                        "_rightNode": undefined,
                         "fromField": "fieldC",
                         "fromTable": "tableC",
                         "toField": "fieldB1",
@@ -238,11 +262,13 @@ describe('RelationExpander', () => {
                     "_outputTarget": "tableB",
                     "opType": "AND",
                 },
+                "_rightNode": undefined,
                 "fromField": "fieldB2",
                 "fromTable": "tableB",
                 "toField": "fieldA2",
                 "toTable": "tableA"
             },
+            "_rightNode": undefined,
             "limit": undefined,
             "orderBy": undefined,
             "outputTarget": "tableA"
@@ -272,6 +298,8 @@ describe('RelationExpander', () => {
                 "_leftNode": {
                     "_leftNode": {
                         "_leftNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableD.fieldD1 = 0",
                             "conditionValue": "0",
@@ -281,6 +309,8 @@ describe('RelationExpander', () => {
                             "table": "tableD",
                         },
                         "_rightNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableD.fieldD2 = 1",
                             "conditionValue": "1",
@@ -292,6 +322,7 @@ describe('RelationExpander', () => {
                         "_outputTarget": "tableD",
                         "opType": "AND",
                     },
+                    "_rightNode": undefined,
                     "fromField": "fieldD",
                     "fromTable": "tableD",
                     "toField": "fieldA1",
@@ -301,6 +332,8 @@ describe('RelationExpander', () => {
                     "_leftNode": {
                         "_leftNode": {
                             "_leftNode": {
+                                "_leftNode": undefined,
+                                "_rightNode": undefined,
                                 "conditionOp": "=",
                                 "conditionStr": "tableC.fieldC1 = 2",
                                 "conditionValue": "2",
@@ -309,12 +342,15 @@ describe('RelationExpander', () => {
                                 "modifyValue": undefined,
                                 "table": "tableC",
                             },
+                            "_rightNode": undefined,
                             "fromField": "fieldC",
                             "fromTable": "tableC",
                             "toField": "fieldB1",
                             "toTable": "tableB"
                         },
                         "_rightNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableB.fieldB = 3",
                             "conditionValue": "3",
@@ -326,6 +362,7 @@ describe('RelationExpander', () => {
                         "_outputTarget": "tableB",
                         "opType": "OR",
                     },
+                    "_rightNode": undefined,
                     "fromField": "fieldB2",
                     "fromTable": "tableB",
                     "toField": "fieldA2",
@@ -334,6 +371,7 @@ describe('RelationExpander', () => {
                 "_outputTarget": "tableA",
                 "opType": "AND",
             },
+            "_rightNode": undefined,
             "limit": undefined,
             "orderBy": undefined,
             "outputTarget": "tableA"
@@ -362,6 +400,8 @@ describe('RelationExpander', () => {
             "_leftNode": {
                 "_leftNode": {
                     "_leftNode": {
+                        "_leftNode": undefined,
+                        "_rightNode": undefined,
                         "conditionOp": "=",
                         "conditionStr": "tableB.fieldB = 0",
                         "conditionValue": "0",
@@ -372,6 +412,8 @@ describe('RelationExpander', () => {
                     },
                     "_rightNode": {
                         "_leftNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableC.fieldC1 = 1",
                             "conditionValue": "1",
@@ -380,6 +422,7 @@ describe('RelationExpander', () => {
                             "modifyValue": undefined,
                             "table": "tableC",
                         },
+                        "_rightNode": undefined,
                         "fromField": "fieldC",
                         "fromTable": "tableC",
                         "toField": "fieldB1",
@@ -388,11 +431,13 @@ describe('RelationExpander', () => {
                     "_outputTarget": "tableB",
                     "opType": "AND",
                 },
+                "_rightNode": undefined,
                 "fromField": "fieldB2",
                 "fromTable": "tableB",
                 "toField": "fieldA2",
                 "toTable": "tableA",
             },
+            "_rightNode": undefined,
             "limit": undefined,
             "orderBy": undefined,
             "outputTarget": "tableA"
@@ -421,6 +466,8 @@ describe('RelationExpander', () => {
             "_leftNode": {
                 "_leftNode": {
                     "_leftNode": {
+                        "_leftNode": undefined,
+                        "_rightNode": undefined,
                         "conditionOp": "=",
                         "conditionStr": "tableD.fieldD1 = 0",
                         "conditionValue": "0",
@@ -429,12 +476,15 @@ describe('RelationExpander', () => {
                         "modifyValue": undefined,
                         "table": "tableD",
                     },
+                    "_rightNode": undefined,
                     "fromField": "fieldD",
                     "fromTable": "tableD",
                     "toField": "fieldA1",
                     "toTable": "tableA",
                 },
                 "_rightNode": {
+                    "_leftNode": undefined,
+                    "_rightNode": undefined,
                     "conditionOp": "=",
                     "conditionStr": "tableA.fieldA = 1",
                     "conditionValue": "1",
@@ -446,6 +496,7 @@ describe('RelationExpander', () => {
                 "_outputTarget": "tableA",
                 "opType": "AND",
             },
+            "_rightNode": undefined,
             "limit": undefined,
             "orderBy": undefined,
             "outputTarget": "tableA"

@@ -13,4 +13,4 @@ injector.set<IdGenerator>('MockIdGenerator', mockIdGenerator);
 injector.set('IdGenerator', instance(mockIdGenerator));
 
 injector.set('FetchProxy', new MockFetchProxy());
-injector.set('ServiceConfigSource', new FileServiceConfigSource(path.join(__dirname, './test-data/test-service-config.json')));
+injector.set('ServiceConfigSource', new FileServiceConfigSource(path.join(path.resolve(), './test/test-data/test-service-config.json')));

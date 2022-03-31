@@ -10,6 +10,7 @@ describe('ExpressionTreeParser', () => {
         const resultTree: IExpressionTreeNode = parser.parse('tableA', whereStr, ['tableA.fieldA3 DESC'], [0, 100]);
         expect(resultTree).to.be.deep.equal({
             "_leftNode": undefined,
+            "_rightNode": undefined,
             "limit": [
                 0,
                 100
@@ -27,6 +28,8 @@ describe('ExpressionTreeParser', () => {
         const resultTree: IExpressionTreeNode = parser.parse('tableA', whereStr)!;
         expect(resultTree).to.be.deep.equal({
             "_leftNode": {
+                "_leftNode": undefined,
+                "_rightNode": undefined,
                 "conditionOp": "!=",
                 "conditionStr": "(tableB.fieldB & 2) != 0",
                 "conditionValue": "0",
@@ -35,6 +38,7 @@ describe('ExpressionTreeParser', () => {
                 "modifyValue": "2",
                 "table": "tableB",
             },
+            "_rightNode": undefined,
             "limit": undefined,
             "orderBy": undefined,
             "outputTarget": "tableA",
@@ -48,6 +52,8 @@ describe('ExpressionTreeParser', () => {
         expect(resultTree).to.be.deep.equal({
             "_leftNode": {
                 "_leftNode": {
+                    "_leftNode": undefined,
+                    "_rightNode": undefined,
                     "conditionOp": "!=",
                     "conditionStr": "(tableB.fieldB & 2) != 0",
                     "conditionValue": "0",
@@ -58,6 +64,8 @@ describe('ExpressionTreeParser', () => {
                 },
                 "_rightNode": {
                     "_leftNode": {
+                        "_leftNode": undefined,
+                        "_rightNode": undefined,
                         "conditionOp": "IN",
                         "conditionStr": "tableA.fieldA IN (\"0912\",\"0934\")",
                         "conditionValue": "(\"0912\",\"0934\")",
@@ -67,6 +75,8 @@ describe('ExpressionTreeParser', () => {
                         "table": "tableA",
                     },
                     "_rightNode": {
+                        "_leftNode": undefined,
+                        "_rightNode": undefined,
                         "conditionOp": "LIKE",
                         "conditionStr": "tableC.fieldC LIKE \"O%\"",
                         "conditionValue": "\"O%\"",
@@ -75,10 +85,13 @@ describe('ExpressionTreeParser', () => {
                         "modifyValue": undefined,
                         "table": "tableC",
                     },
+                    "_outputTarget": undefined,
                     "opType": "AND",
                 },
+                "_outputTarget": undefined,
                 "opType": "OR",
             },
+            "_rightNode": undefined,
             "limit": undefined,
             "orderBy": undefined,
             "outputTarget": "tableA",
@@ -93,6 +106,8 @@ describe('ExpressionTreeParser', () => {
             "_leftNode": {
                 "_leftNode": {
                     "_leftNode": {
+                        "_leftNode": undefined,
+                        "_rightNode": undefined,
                         "conditionOp": "=",
                         "conditionStr": "tableA.fieldA = 0",
                         "conditionValue": "0",
@@ -103,6 +118,8 @@ describe('ExpressionTreeParser', () => {
                     },
                     "_rightNode": {
                         "_leftNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableB.fieldB = 1",
                             "conditionValue": "1",
@@ -112,6 +129,8 @@ describe('ExpressionTreeParser', () => {
                             "table": "tableB",
                         },
                         "_rightNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableC.fieldC = 2",
                             "conditionValue": "2",
@@ -120,13 +139,17 @@ describe('ExpressionTreeParser', () => {
                             "modifyValue": undefined,
                             "table": "tableC",
                         },
+                        "_outputTarget": undefined,
                         "opType": "AND",
                     },
+                    "_outputTarget": undefined,
                     "opType": "OR",
                 },
                 "_rightNode": {
                     "_leftNode": {
                         "_leftNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableD.fieldD = 3",
                             "conditionValue": "3",
@@ -136,6 +159,8 @@ describe('ExpressionTreeParser', () => {
                             "table": "tableD",
                         },
                         "_rightNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableE.fieldE = 4",
                             "conditionValue": "4",
@@ -144,9 +169,12 @@ describe('ExpressionTreeParser', () => {
                             "modifyValue": undefined,
                             "table": "tableE",
                         },
+                        "_outputTarget": undefined,
                         "opType": "AND",
                     },
                     "_rightNode": {
+                        "_leftNode": undefined,
+                        "_rightNode": undefined,
                         "conditionOp": "=",
                         "conditionStr": "tableF.fieldF = 5",
                         "conditionValue": "5",
@@ -155,10 +183,13 @@ describe('ExpressionTreeParser', () => {
                         "modifyValue": undefined,
                         "table": "tableF",
                     },
+                    "_outputTarget": undefined,
                     "opType": "OR",
                 },
+                "_outputTarget": undefined,
                 "opType": "AND",
             },
+            "_rightNode": undefined,
             "limit": undefined,
             "orderBy": undefined,
             "outputTarget": "tableA",
@@ -172,6 +203,8 @@ describe('ExpressionTreeParser', () => {
         expect(resultTree).to.be.deep.equal({
             "_leftNode": {
                 "_leftNode": {
+                    "_leftNode": undefined,
+                    "_rightNode": undefined,
                     "conditionOp": "=",
                     "conditionStr": "tableA.fieldA = 0",
                     "conditionValue": "0",
@@ -183,6 +216,8 @@ describe('ExpressionTreeParser', () => {
                 "_rightNode": {
                     "_leftNode": {
                         "_leftNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableB.fieldB = 1",
                             "conditionValue": "1",
@@ -192,6 +227,8 @@ describe('ExpressionTreeParser', () => {
                             "table": "tableB",
                         },
                         "_rightNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableC.fieldC = 2",
                             "conditionValue": "2",
@@ -200,10 +237,13 @@ describe('ExpressionTreeParser', () => {
                             "modifyValue": undefined,
                             "table": "tableC",
                         },
+                        "_outputTarget": undefined,
                         "opType": "OR",
                     },
                     "_rightNode": {
                         "_leftNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableD.fieldD = 3",
                             "conditionValue": "3",
@@ -213,6 +253,8 @@ describe('ExpressionTreeParser', () => {
                             "table": "tableD",
                         },
                         "_rightNode": {
+                            "_leftNode": undefined,
+                            "_rightNode": undefined,
                             "conditionOp": "=",
                             "conditionStr": "tableE.fieldE = 4",
                             "conditionValue": "4",
@@ -221,12 +263,16 @@ describe('ExpressionTreeParser', () => {
                             "modifyValue": undefined,
                             "table": "tableE",
                         },
+                        "_outputTarget": undefined,
                         "opType": "OR",
                     },
+                    "_outputTarget": undefined,
                     "opType": "AND",
                 },
+                "_outputTarget": undefined,
                 "opType": "AND",
             },
+            "_rightNode": undefined,
             "limit": undefined,
             "orderBy": undefined,
             "outputTarget": "tableA"
