@@ -1,9 +1,10 @@
 import 'mocha';
 import { expect } from 'chai';
-import IExpressionTreeNode from '../../src/expression-tree/ExpressionTreeNode';
-import ExpressionTreeBuilder from '../../src/expression-tree/ExpressionTreeBuilder';
+
 import ConditionNode from '../../src/expression-tree/ConditionNode';
 import BinaryOperatorNode from '../../src/expression-tree/BinaryOperatorNode';
+import IExpressionTreeNode from '../../src/expression-tree/ExpressionTreeNode';
+import ExpressionTreeBuilder from '../../src/expression-tree/ExpressionTreeBuilder';
 
 describe('ExpressionTreeBuilder', () => {
     it('should build new condition node when first call buildCondition', () => {
@@ -11,15 +12,6 @@ describe('ExpressionTreeBuilder', () => {
         builder.buildCondition('(tableB.fieldB & 2) != 0');
         const expressionTree: IExpressionTreeNode = builder.getResult()!;
         expect((expressionTree as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
-    });
-
-    it('should build new andNode and append exist tree to left branch when call buildAnd', () => {
-        const builder: ExpressionTreeBuilder = new ExpressionTreeBuilder();
-        builder.buildCondition('(tableB.fieldB & 2) != 0');
-        builder.buildAnd();
-        const expressionTree: IExpressionTreeNode = builder.getResult()!;
-        expect((expressionTree as BinaryOperatorNode).opType).to.be.equal('AND');
-        expect((expressionTree.leftNode as ConditionNode).conditionStr).to.be.equal('(tableB.fieldB & 2) != 0');
     });
 
     it('should build new condition node and append itself to the tree\'s right branch when call buildCondition with exist tree', () => {

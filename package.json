@@ -34,7 +34,7 @@
         "build": "tsc --build --clean && tsc",
         "deploy": "npm run build && npm publish",
         "test": "mocha -r test/init.test.ts 'test/**/*.test.ts' --exit --recursive",
-        "test-coverage": "nyc --reporter=text mocha --loader ts-node/esm -r test/init.test.ts 'test/**/*.test.ts' --exit --recursive"
+        "test-coverage": "nyc --reporter=text mocha -r test/init.test.ts 'test/**/*.test.ts' --exit --recursive"
     },
     "author": "RuiChen",
     "license": "MIT",

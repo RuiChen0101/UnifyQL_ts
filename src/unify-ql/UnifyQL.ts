@@ -3,9 +3,9 @@ import IUnifyQL from "./IUnifyQL";
 import injector from "../utility/Injector";
 import ServiceLookup from "../lookup/ServiceLookup";
 import PlanExecutor from "../plan-executor/PlanExecutor";
-import QueryChainBuilder from "../query-chain/QueryChainBuilder";
-import RelationExpander from "../relation-expand/RelationExpander";
+import RelationLinker from "../relation-linking/RelationLinker";
 import IExpressionTreeNode from "../expression-tree/ExpressionTreeNode";
+import RelationChainBuilder from "../relation-chain/RelationChainBuilder";
 import extractQLElement from "../unify-ql-element/ExtractUnifyQlElement";
 import IServiceConfigSource from "../service-config/IServiceConfigSource";
 import ExpressionTreeParser from "../expression-tree/ExpressionTreeParser";
@@ -20,15 +20,15 @@ class UnifyQL implements IUnifyQL {
     public async query(unifyQl: string): Promise<any> {
         const serviceLookup: ServiceLookup = new ServiceLookup();
         const element = extractQLElement(unifyQl.replaceAll('\n', ' '));
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(element.queryTarget, element.with, element.link);
-        const queryChain = queryChainBuilder.build();
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(element.queryTarget, element.with, element.link);
+        const relationChain = relationChainBuilder.build();
 
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse(element.queryTarget, element.where, element.orderBy, element.limit);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
-        expander.expand();
-        const expandedTree = expander.getResult();
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
+        linker.expand();
+        const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();

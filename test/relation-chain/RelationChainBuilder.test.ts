@@ -1,18 +1,18 @@
 import 'mocha';
 import { expect } from 'chai';
-import QueryChainBuilder from '../../src/query-chain/QueryChainBuilder';
+import RelationChainBuilder from '../../src/relation-chain/RelationChainBuilder';
 
-describe('QueryChainBuilder', () => {
+describe('RelationChainBuilder', () => {
     it('should build query chain', () => {
-        const builder: QueryChainBuilder = new QueryChainBuilder(
+        const builder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
 
-        const queryChain = builder.build();
+        const relationChain = builder.build();
 
-        const forwardRelationMap = queryChain.forwardRelationMap;
+        const forwardRelationMap = relationChain.forwardRelationMap;
         expect(forwardRelationMap['tableA']['tableB']).to.be.deep.equal({
             fromField: 'fieldA2',
             fromTable: 'tableA',
@@ -32,7 +32,7 @@ describe('QueryChainBuilder', () => {
             toTable: 'tableC'
         });
 
-        const backwardRelationMap = queryChain.backwardRelationMap;
+        const backwardRelationMap = relationChain.backwardRelationMap;
         expect(backwardRelationMap['tableD']['tableA']).to.be.deep.equal({
             fromField: 'fieldD',
             fromTable: 'tableD',
@@ -54,24 +54,24 @@ describe('QueryChainBuilder', () => {
     });
 
     it('should build query chain without with and link', () => {
-        const builder: QueryChainBuilder = new QueryChainBuilder(
+        const builder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             [],
             []
         );
 
-        const queryChain = builder.build();
+        const relationChain = builder.build();
 
-        const forwardRelationMap = queryChain.forwardRelationMap;
+        const forwardRelationMap = relationChain.forwardRelationMap;
         expect(forwardRelationMap).to.be.deep.equal({});
 
-        const backwardRelationMap = queryChain.backwardRelationMap;
+        const backwardRelationMap = relationChain.backwardRelationMap;
         expect(backwardRelationMap).to.be.deep.equal({});
     });
 
     it('should throw exception if using undefined table', () => {
         expect(function () {
-            const builder: QueryChainBuilder = new QueryChainBuilder(
+            const builder: RelationChainBuilder = new RelationChainBuilder(
                 'tableA',
                 ['tableB', 'tableC'],
                 ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']

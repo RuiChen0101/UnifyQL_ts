@@ -1,20 +1,20 @@
-import QueryChain from "./QueryChain";
-import IQueryChainRelation from "./IQueryChainRelation";
-import QueryChainException from "../exception/QueryChainException";
+import RelationChain from "./RelationChain";
+import IRelationChainNode from "./IRelationChainNode";
+import RelationChainException from "../exception/RelationChainException";
 
-type IQueryChainRelationMap = { [key: string]: { [key: string]: IQueryChainRelation } };
+type IRelationChainMap = { [key: string]: { [key: string]: IRelationChainNode } };
 
-class QueryChainBuilder {
+class RelationChainBuilder {
     private target: string = '';
-    private completeRelationMap: IQueryChainRelationMap = {};
+    private completeRelationMap: IRelationChainMap = {};
 
     constructor(target: string, associationTables: string[], relations: string[]) {
         this.target = target.split('.')[0];
         let definedTables: string[] = [this.target, ...associationTables];
         for (const relation of relations) {
-            const tableRelation: IQueryChainRelation = this.extractRelation(relation);
+            const tableRelation: IRelationChainNode = this.extractRelation(relation);
             if (!definedTables.includes(tableRelation.fromTable) || !definedTables.includes(tableRelation.toTable)) {
-                throw new QueryChainException(`${relation} using undefined table`);
+                throw new RelationChainException(`${relation} using undefined table`);
             }
             this.safeMapAssign(this.completeRelationMap, tableRelation.fromTable, tableRelation.toTable, tableRelation);
             this.safeMapAssign(
@@ -30,15 +30,15 @@ class QueryChainBuilder {
         }
     }
 
-    public build(): QueryChain {
-        const forwardRelationMap: IQueryChainRelationMap = {};
-        const backwardRelationMap: IQueryChainRelationMap = {};
+    public build(): RelationChain {
+        const forwardRelationMap: IRelationChainMap = {};
+        const backwardRelationMap: IRelationChainMap = {};
         let trackingTable: string[] = [this.target];
         let visitedTable: string[] = [];
         const endNode: Set<string> = new Set();
         while (trackingTable.length !== 0) {
             const table: string = trackingTable.shift()!;
-            const relation: { [key: string]: IQueryChainRelation } = this.completeRelationMap[table];
+            const relation: { [key: string]: IRelationChainNode } = this.completeRelationMap[table];
             if (relation === undefined) {
                 visitedTable.push(table);
                 continue;
@@ -60,7 +60,7 @@ class QueryChainBuilder {
         visitedTable = [];
         while (trackingTable.length !== 0) {
             const table: string = trackingTable.shift()!;
-            const relation: { [key: string]: IQueryChainRelation } = this.completeRelationMap[table];
+            const relation: { [key: string]: IRelationChainNode } = this.completeRelationMap[table];
             if (relation === undefined) {
                 visitedTable.push(table);
                 continue;
@@ -73,7 +73,7 @@ class QueryChainBuilder {
             }
             visitedTable.push(table);
         }
-        return new QueryChain(forwardRelationMap, backwardRelationMap);
+        return new RelationChain(forwardRelationMap, backwardRelationMap);
     }
 
     private safeMapAssign(map: any, key1: string, key2: string, value: any): void {
@@ -81,7 +81,7 @@ class QueryChainBuilder {
         map[key1][key2] = value;
     }
 
-    private extractRelation(relation: string): IQueryChainRelation {
+    private extractRelation(relation: string): IRelationChainNode {
         const side = relation.split('=');
         const left = side[0].split('.');
         const right = side[1].split('.');
@@ -94,4 +94,4 @@ class QueryChainBuilder {
     }
 }
 
-export default QueryChainBuilder;
+export default RelationChainBuilder;

@@ -152,6 +152,32 @@ describe('UnifyQL', () => {
         expect(queryReq3.reqOption.body).to.be.equal('QUERY tableA WITH tableC,tableB LINK tableC.fieldC=tableB.fieldB1,tableB.fieldB2=tableA.fieldA2 WHERE ((tableA.fieldA1 IN (1,2,3,4) AND tableC.fieldC1 = 2) AND (tableA.fieldA1 IN (5,6,7,8) OR tableB.fieldB = 3)) ORDER BY tableA.tableA3 ASC LIMIT 10, 100');
     });
 
+    it('should avoid SQL injection - Authorization Bypass', async () => {
+
+        const uqlStr = 'QUERY tableA WITH tableB LINK tableA.fieldA2=tableB.fieldB2 WHERE tableB.fieldB = "valueB" OR 1=1--"';
+
+        const unifyQL = new UnifyQL(serviceConfigSource);
+        try {
+            await unifyQL.query(uqlStr);
+            expect.fail();
+        } catch (e: any) {
+            expect(e.message).to.be.equal('Bad state: empty tree');
+        }
+    });
+
+    it('should avoid SQL injection - Malicious Commands', async () => {
+
+        const uqlStr = 'QUERY tableA WITH tableB LINK tableA.fieldA2=tableB.fieldB2 WHERE tableB.fieldB = "valueB"; DROP TABLE tableA--"';
+
+        const unifyQL = new UnifyQL(serviceConfigSource);
+        try {
+            await unifyQL.query(uqlStr);
+            expect.fail();
+        } catch (e: any) {
+            expect(e.message).to.be.equal('Bad state: empty tree');
+        }
+    });
+
     afterEach(() => {
         MockFetch.clearResult();
         reset(mockIdGenerator);

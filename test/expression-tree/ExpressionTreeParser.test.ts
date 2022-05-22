@@ -278,4 +278,30 @@ describe('ExpressionTreeParser', () => {
             "outputTarget": "tableA"
         });
     });
+
+    it('should throw exception if invalid statement - Authorization Bypass', () => {
+        const parser: ExpressionTreeParser = new ExpressionTreeParser();
+        expect(function () {
+            parser.parse('tableA', 'tableA.fieldA="valueA" OR 1=1--"');
+        }).to.throw('Bad state: empty tree');
+        expect(function () {
+            parser.parse('tableA', 'tableA.fieldA=123 OR 1=1--');
+        }).to.throw('Bad state: empty tree');
+        expect(function () {
+            parser.parse('tableA', 'tableA.fieldA IN (123) OR 1=1--)');
+        }).to.throw('Bad state: empty tree');
+    });
+
+    it('should throw exception if invalid statement - Malicious Commands', () => {
+        const parser: ExpressionTreeParser = new ExpressionTreeParser();
+        expect(function () {
+            parser.parse('tableA', 'tableA.fieldA="valueA"; DROP TABLE tableA--"');
+        }).to.throw('Bad state: empty tree');
+        expect(function () {
+            parser.parse('tableA', 'tableA.fieldA=123; DROP TABLE tableA--"');
+        }).to.throw('Bad state: empty tree');
+        expect(function () {
+            parser.parse('tableA', 'tableA.fieldA IN (123); DROP TABLE tableA--)');
+        }).to.throw('Bad state: unresolved broken node');
+    });
 });

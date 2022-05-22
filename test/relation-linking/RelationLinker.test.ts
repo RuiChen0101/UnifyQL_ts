@@ -1,27 +1,28 @@
 import 'mocha';
 import { expect } from 'chai';
-import QueryChainBuilder from '../../src/query-chain/QueryChainBuilder';
-import RelationExpander from '../../src/relation-expand/RelationExpander';
+
+import RelationLinker from '../../src/relation-linking/RelationLinker';
 import IExpressionTreeNode from '../../src/expression-tree/ExpressionTreeNode';
+import RelationChainBuilder from '../../src/relation-chain/RelationChainBuilder';
 import ExpressionTreeParser from '../../src/expression-tree/ExpressionTreeParser';
 
-describe('RelationExpander', () => {
+describe('RelationLinker', () => {
     it('should direct return node if input express tree is just output target node', () => {
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = '';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr, ['tableA.fieldA3 DESC'], [0, 100]);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = expander.expand();
-        const resultTree = expander.getResult();
+        const resultTable = linker.expand();
+        const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
         expect(resultTree).to.be.deep.equal({
@@ -34,21 +35,21 @@ describe('RelationExpander', () => {
     });
 
     it('should direct return node if input express tree is just single condition', () => {
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = '(tableC.fieldC1 & 2) != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr, ['tableA.fieldA3 DESC'], [0, 100]);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = expander.expand();
-        const resultTree = expander.getResult();
+        const resultTable = linker.expand();
+        const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
         expect(resultTree).to.be.deep.equal({
@@ -85,21 +86,21 @@ describe('RelationExpander', () => {
     });
 
     it('should expand and link relation to the same level for expression tree', () => {
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableA.fieldA = 0 AND tableD.fieldD1 = 1';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = expander.expand();
-        const resultTree = expander.getResult();
+        const resultTable = linker.expand();
+        const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
         expect(resultTree).to.be.deep.equal({
@@ -144,21 +145,21 @@ describe('RelationExpander', () => {
     });
 
     it('should skip expansion if left and right node are using the same table', () => {
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableC.fieldC1 = 0 AND tableC.fieldC2 = 1';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = expander.expand();
-        const resultTree = expander.getResult();
+        const resultTable = linker.expand();
+        const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
         expect(resultTree).to.be.deep.equal({
@@ -210,21 +211,21 @@ describe('RelationExpander', () => {
     });
 
     it('should skip expansion if left and right node are in same service and return resultTable as the table that has higher level', () => {
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableB.fieldB = 0 AND tableC.fieldC1 = 1';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = expander.expand();
-        const resultTree = expander.getResult();
+        const resultTable = linker.expand();
+        const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
         expect(resultTree).to.be.deep.equal({
@@ -276,21 +277,21 @@ describe('RelationExpander', () => {
     });
 
     it('should expand and link relation for complex expression tree 1', () => {
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableD.fieldD1 = 0 AND tableD.fieldD2 = 1 AND (tableC.fieldC1 = 2 OR tableB.fieldB = 3)';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = expander.expand();
-        const resultTree = expander.getResult();
+        const resultTable = linker.expand();
+        const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
         expect(resultTree).to.be.deep.equal({
@@ -379,21 +380,21 @@ describe('RelationExpander', () => {
     });
 
     it('should link relation to target when call finalize', () => {
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableB.fieldB = 0 AND tableC.fieldC1 = 1';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = expander.expand();
-        const resultTree = expander.getResult();
+        const resultTable = linker.expand();
+        const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
         expect(resultTree).to.be.deep.equal({
@@ -445,21 +446,21 @@ describe('RelationExpander', () => {
     });
 
     it('should skip link if result is already satisfy the target when call finalize', () => {
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableD.fieldD1 = 0 AND tableA.fieldA = 1';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = expander.expand();
-        const resultTree = expander.getResult();
+        const resultTable = linker.expand();
+        const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
         expect(resultTree).to.be.deep.equal({

@@ -5,8 +5,8 @@ import { reset, when } from 'ts-mockito';
 import injector from '../../src/utility/Injector';
 import IdGenerator from '../../src/utility/IdGenerator';
 import ServiceLookup from '../../src/lookup/ServiceLookup';
-import QueryChainBuilder from '../../src/query-chain/QueryChainBuilder';
-import RelationExpander from '../../src/relation-expand/RelationExpander';
+import RelationChainBuilder from '../../src/relation-chain/RelationChainBuilder';
+import RelationLinker from '../../src/relation-linking/RelationLinker';
 import IExpressionTreeNode from '../../src/expression-tree/ExpressionTreeNode';
 import ExpressionTreeParser from '../../src/expression-tree/ExpressionTreeParser';
 import ExecutionPlanGenerator from '../../src/execution-plan/ExecutionPlanGenerator';
@@ -17,20 +17,20 @@ const serviceLookup: ServiceLookup = new ServiceLookup();
 
 describe('ExecutionPlanGenerator', () => {
     it('should generate execution plan for empty condition', () => {
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = '';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr, ['tableA.fieldA3 DESC'], [0, 100]);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
-        expander.expand();
-        const expandedTree = expander.getResult();
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
+        linker.expand();
+        const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
@@ -49,20 +49,20 @@ describe('ExecutionPlanGenerator', () => {
     });
 
     it('should generate execution plan for single condition', () => {
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableA.fieldA != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
-        expander.expand();
-        const expandedTree = expander.getResult();
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
+        linker.expand();
+        const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
@@ -81,20 +81,20 @@ describe('ExecutionPlanGenerator', () => {
     });
 
     it('should generate execution plan for condition and relation with the same service', () => {
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = '(tableC.fieldC1 & 2) != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
-        expander.expand();
-        const expandedTree = expander.getResult();
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
+        linker.expand();
+        const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
@@ -117,20 +117,20 @@ describe('ExecutionPlanGenerator', () => {
 
     it('should generate execution plan for condition and relation with the different service', () => {
         when(mockIdGenerator.nano8()).thenReturn('12345678');
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableD.fieldD1 != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
-        expander.expand();
-        const expandedTree = expander.getResult();
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
+        linker.expand();
+        const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
@@ -160,20 +160,20 @@ describe('ExecutionPlanGenerator', () => {
 
     it('should generate execution plan for condition and relation with recursive dependency', () => {
         when(mockIdGenerator.nano8()).thenReturn('12345678').thenReturn('23456789');
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableD.fieldD2', 'tableD.fieldD1=tableB.fieldB1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableC.fieldC1 != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
-        expander.expand();
-        const expandedTree = expander.getResult();
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
+        linker.expand();
+        const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
@@ -216,20 +216,20 @@ describe('ExecutionPlanGenerator', () => {
     });
 
     it('should generate execution plan for expression tree with the same service', () => {
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableB.fieldB = 0 AND tableC.fieldC1 = 1';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
-        expander.expand();
-        const expandedTree = expander.getResult();
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
+        linker.expand();
+        const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
@@ -255,20 +255,20 @@ describe('ExecutionPlanGenerator', () => {
 
     it('should generate execution plan for expression tree with the different service', () => {
         when(mockIdGenerator.nano8()).thenReturn('12345678');
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableB.fieldB = 0 AND tableD.fieldD = 1';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
-        expander.expand();
-        const expandedTree = expander.getResult();
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
+        linker.expand();
+        const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
@@ -302,20 +302,20 @@ describe('ExecutionPlanGenerator', () => {
 
     it('should generate execution plan for complex expression tree 1', () => {
         when(mockIdGenerator.nano8()).thenReturn('12345678');
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableD.fieldD1 = 0 AND tableD.fieldD2 = 1 AND (tableC.fieldC1 = 2 OR tableB.fieldB = 3)';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
-        expander.expand();
-        const expandedTree = expander.getResult();
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
+        linker.expand();
+        const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();
@@ -351,20 +351,20 @@ describe('ExecutionPlanGenerator', () => {
 
     it('should generate execution plan for complex expression tree 2', () => {
         when(mockIdGenerator.nano8()).thenReturn('12345678').thenReturn('23456789');
-        const queryChainBuilder: QueryChainBuilder = new QueryChainBuilder(
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
             'tableA',
             ['tableB', 'tableC', 'tableD'],
             ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
         );
-        const queryChain = queryChainBuilder.build();
+        const relationChain = relationChainBuilder.build();
 
         const whereStr: string = 'tableD.fieldD1 = 0 AND tableC.fieldC1 = 2 AND (tableD.fieldD2 = 1 OR tableB.fieldB = 3)';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
         const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr, ['tableA.fieldA3 DESC'], [0, 100]);
 
-        const expander: RelationExpander = new RelationExpander(expressionTree, queryChain);
-        expander.expand();
-        const expandedTree = expander.getResult();
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
+        linker.expand();
+        const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
         generator.generate();

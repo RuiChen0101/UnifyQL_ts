@@ -1,6 +1,5 @@
-import ExpressionTreeBuildException from "../exception/ExpressionTreeBuildException";
-import ExpressionTreeBuilder from "./ExpressionTreeBuilder";
 import IExpressionTreeNode from "./ExpressionTreeNode";
+import ExpressionTreeBuildException from "../exception/ExpressionTreeBuildException";
 
 type ModifierOp = '&' | '|' | '+' | '-' | '*' | '/';
 type ConditionOp = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'LIKE' | 'IS NULL' | 'IS NOT NULL' | 'IN';
@@ -17,20 +16,37 @@ class ConditionNode extends IExpressionTreeNode {
     constructor(conditionStr: string) {
         super();
         this.conditionStr = conditionStr;
-        const regex: RegExp = /[\(]?\s*([\d\w]*)\.([\d\w]*)\s*([\&\|\+\-\*\/])?\s*([\"\d\w]*)?\s*[\)]?\s*(=|!=|<|<=|>|>=|LIKE|NOT IN|IN|IS NULL|IS NOT NULL)\s*([^\s]+)*|/g;
+        const regex: RegExp = /[\(]?\s*(\w*)\.(\w*)\s*([\&\|\+\-\*\/])?\s*([^)]*)?\s*[\)]?\s*(=|!=|<|<=|>|>=|LIKE|NOT IN|IN|IS NULL|IS NOT NULL)\s*(.*)/g;
         const capturedGroups: RegExpExecArray | null = regex.exec(this.conditionStr);
-        if (capturedGroups === null) throw new ExpressionTreeBuildException('Condition info format mismatch');
+        if (capturedGroups === null) throw new ExpressionTreeBuildException('Invalid format');
         this.table = capturedGroups[1];
         this.field = capturedGroups[2];
         this.modifier = capturedGroups[3] as (ModifierOp | undefined);
         this.modifyValue = capturedGroups[4];
         this.conditionOp = capturedGroups[5] as ConditionOp;
         this.conditionValue = capturedGroups[6];
+        if (!ConditionNode.isValidValue(this.conditionOp, this.conditionValue))
+            throw new ExpressionTreeBuildException('Invalid format');
+    }
+
+    public static isValidValue(op: string, value?: string): boolean {
+        if (/=|!=|<|<=|>|>=|LIKE/.test(op)) {
+            return value !== null && /^\d+$|^"[^"]+"$/.test(value!);
+        } else if (/IS NULL|IS NOT NULL/.test(op)) {
+            return value === null || value === '';
+        } else if (/IN|NOT IN/.test(op)) {
+            return value !== null && /^\(([^\(\),]+,)*([^\(\),]+)\)$/.test(value!);
+        }
+        return false;
     }
 
     public static isValidCondition(str: string): boolean {
-        const regex: RegExp = /[\(]?\s*([\d\w]*)\.([\d\w]*)\s*([\&\|\+\-\*\/])?\s*([\"\d\w]*)?\s*[\)]?\s*(=|!=|<|<=|>|>=|LIKE|NOT IN|IN)\s*([^\s]+)|[\(]?\s*([\d\w]*)\.([\d\w]*)\s*([\&\|\+\-\*\/])?\s*([\"\d\w]*)?\s*[\)]?\s*(IS NULL|IS NOT NULL)/g;
-        return regex.test(str);
+        try {
+            new ConditionNode(str);
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 }
 

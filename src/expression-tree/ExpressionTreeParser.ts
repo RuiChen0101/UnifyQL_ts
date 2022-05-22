@@ -5,6 +5,10 @@ import OutputTargetNode from "./OutputTargetNode";
 class ExpressionTreeParser {
 
     public parse(query: string, whereStr: string, orderBy?: string[], limit?: number[]): IExpressionTreeNode {
+        if (whereStr === '') {
+            const outputNode = new OutputTargetNode(query, orderBy, limit);
+            return outputNode;
+        }
         const regex: RegExp = /\s*(AND|OR|\(|\))\s*/gm;
         const tokens: string[] = whereStr.split(regex);
         const builder: ExpressionTreeBuilder = new ExpressionTreeBuilder();

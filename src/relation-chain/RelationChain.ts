@@ -1,13 +1,13 @@
-import IQueryChainRelation from "./IQueryChainRelation";
-import QueryChainException from "../exception/QueryChainException";
+import IRelationChainNode from "./IRelationChainNode";
+import RelationChainException from "../exception/RelationChainException";
 
-type IQueryChainRelationMap = { [key: string]: { [key: string]: IQueryChainRelation } };
+type IRelationChainMap = { [key: string]: { [key: string]: IRelationChainNode } };
 
-class QueryChain {
-    public readonly forwardRelationMap: IQueryChainRelationMap;
-    public readonly backwardRelationMap: IQueryChainRelationMap;
+class RelationChain {
+    public readonly forwardRelationMap: IRelationChainMap;
+    public readonly backwardRelationMap: IRelationChainMap;
 
-    constructor(forwardRelationMap: IQueryChainRelationMap, backwardRelationMap: IQueryChainRelationMap) {
+    constructor(forwardRelationMap: IRelationChainMap, backwardRelationMap: IRelationChainMap) {
         this.forwardRelationMap = forwardRelationMap;
         this.backwardRelationMap = backwardRelationMap;
     }
@@ -27,11 +27,11 @@ class QueryChain {
             if (table1ToRoot.includes(parentTable)) return parentTable;
             parents = this.backwardRelationMap[parentTable];
         }
-        throw new QueryChainException(`${table1} and ${table2} has no common parent`);
+        throw new RelationChainException(`${table1} and ${table2} has no common parent`);
     }
 
-    public findRelationPath(from: string, to: string): IQueryChainRelation[] | undefined {
-        const result: IQueryChainRelation[] = [];
+    public findRelationPath(from: string, to: string): IRelationChainNode[] | undefined {
+        const result: IRelationChainNode[] = [];
         if (this.isDescendantOf(from, to)) {
             let parents = this.backwardRelationMap[from];
             while (parents !== undefined) {
@@ -71,15 +71,15 @@ class QueryChain {
         return false;
     }
 
-    public getDirectDescendant(target: string): IQueryChainRelation[] {
+    public getDirectDescendant(target: string): IRelationChainNode[] {
         if (this.forwardRelationMap[target] === undefined) return [];
         return Object.values(this.forwardRelationMap[target]);
     }
 
-    public getDirectParent(target: string): IQueryChainRelation[] {
+    public getDirectParent(target: string): IRelationChainNode[] {
         if (this.backwardRelationMap[target] === undefined) return [];
         return Object.values(this.backwardRelationMap[target]);
     }
 }
 
-export default QueryChain;
+export default RelationChain;

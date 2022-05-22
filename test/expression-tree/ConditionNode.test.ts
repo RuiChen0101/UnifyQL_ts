@@ -3,6 +3,17 @@ import { expect } from 'chai';
 import ConditionNode from '../../src/expression-tree/ConditionNode';
 
 describe('ConditionNode', () => {
+    it('should extract info', () => {
+        const condition: string = 'tableA.fieldA = "1234 5678"';
+        const conditionNode: ConditionNode = new ConditionNode(condition);
+        expect(conditionNode.table).to.be.equal('tableA');
+        expect(conditionNode.field).to.be.equal('fieldA');
+        expect(conditionNode.modifier).to.be.undefined;
+        expect(conditionNode.modifyValue).to.be.undefined;
+        expect(conditionNode.conditionOp).to.be.equal('=');
+        expect(conditionNode.conditionValue).to.be.equal('"1234 5678"');
+    });
+
     it('should extract info without modifier when initialize', () => {
         const condition: string = 'tableA.fieldA IN ("0912","0934")';
         const conditionNode: ConditionNode = new ConditionNode(condition);
@@ -31,5 +42,7 @@ describe('ConditionNode', () => {
         expect(ConditionNode.isValidCondition('tableA.fieldA IN ')).to.be.false;
         expect(ConditionNode.isValidCondition('tableB.fieldB & 2')).to.be.false;
         expect(ConditionNode.isValidCondition('"0912","0934"')).to.be.false;
+        expect(ConditionNode.isValidCondition('1=1')).to.be.false;
+        expect(ConditionNode.isValidCondition('tableA.fieldA="valueA"; DROP Database tableA;--"')).to.be.false;
     });
 });

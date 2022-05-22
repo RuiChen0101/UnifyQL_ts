@@ -1,4 +1,4 @@
-export default class QueryChainException extends Error {
+export default class RelationChainException extends Error {
     public readonly message: string;
 
     constructor(message: string) {

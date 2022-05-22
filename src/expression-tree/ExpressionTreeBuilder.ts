@@ -83,11 +83,16 @@ class ExpressionTreeBuilder {
 
     private flush(): void {
         if (this._expressionTree === undefined) {
-            return;
+            throw new ExpressionTreeBuildException('Bad state: empty tree');
+        } else if (this._expressionTree instanceof BinaryOperatorNode && (this._expressionTree.leftNode === undefined || this._expressionTree.rightNode === undefined)) {
+            throw new ExpressionTreeBuildException(`Bad state: dangling ${this._expressionTree.opType} operator`);
         }
         while (this._nodeStack.length !== 0) {
             const stackTop: IExpressionTreeNode = this._nodeStack.pop()!;
-            stackTop.setRightNode(this._expressionTree!)
+            if (stackTop instanceof BrokenConditionNode) {
+                throw new ExpressionTreeBuildException('Bad state: unresolved broken node');
+            }
+            stackTop.setRightNode(this._expressionTree!);
             this._expressionTree = stackTop;
         }
     }

@@ -1,19 +1,19 @@
-import QueryChain from "../query-chain/QueryChain";
 import RelationNode from "../expression-tree/RelationNode";
+import RelationChain from "../relation-chain/RelationChain";
 import ConditionNode from "../expression-tree/ConditionNode";
 import OutputTargetNode from "../expression-tree/OutputTargetNode";
-import IQueryChainRelation from "../query-chain/IQueryChainRelation";
 import BinaryOperatorNode from "../expression-tree/BinaryOperatorNode";
 import IExpressionTreeNode from "../expression-tree/ExpressionTreeNode";
-import RelationExpanderException from "../exception/RelationExpanderException";
+import IRelationChainRelation from "../relation-chain/IRelationChainNode";
+import RelationLinkerException from "../exception/RelationLinkerException";
 
-class RelationExpander {
-    private _queryChain: QueryChain;
+class RelationLinker {
+    private _relationChain: RelationChain;
     private _resultTable: string = '';
     private _expressionTree: IExpressionTreeNode;
 
-    constructor(expressionTree: IExpressionTreeNode, queryChain: QueryChain) {
-        this._queryChain = queryChain;
+    constructor(expressionTree: IExpressionTreeNode, relationChain: RelationChain) {
+        this._relationChain = relationChain;
         this._expressionTree = expressionTree;
     }
 
@@ -30,15 +30,15 @@ class RelationExpander {
             return;
         }
 
-        if (this._queryChain.isParentOf(target, this._resultTable)) {
-            const relationPath: IQueryChainRelation[] = this._queryChain.findRelationPath(this._resultTable, target)!;
+        if (this._relationChain.isParentOf(target, this._resultTable)) {
+            const relationPath: IRelationChainRelation[] = this._relationChain.findRelationPath(this._resultTable, target)!;
             for (const path of relationPath) {
                 const relationNode = new RelationNode(path.fromTable, path.fromField, path.toTable, path.toField);
                 relationNode.setLeftNode(this._expressionTree);
                 this._expressionTree = relationNode;
             }
         } else {
-            throw new RelationExpanderException(`${target} is not parent of ${this._resultTable}`);
+            throw new RelationLinkerException(`${target} is not parent of ${this._resultTable}`);
         }
     }
 
@@ -50,10 +50,10 @@ class RelationExpander {
 
         if (rootNode instanceof OutputTargetNode) {
             if (rootNode.leftNode === undefined) return rootNode.outputTarget;
-            const expander = new RelationExpander(rootNode.leftNode!, this._queryChain);
-            expander.expand();
-            expander.finalize(rootNode.outputTarget);
-            rootNode.setLeftNode(expander.getResult());
+            const linker = new RelationLinker(rootNode.leftNode!, this._relationChain);
+            linker.expand();
+            linker.finalize(rootNode.outputTarget);
+            rootNode.setLeftNode(linker.getResult());
             return rootNode.outputTarget;
         }
 
@@ -61,23 +61,23 @@ class RelationExpander {
         let rightNodeResultTable: string;
 
         if (rootNode.leftNode === undefined || rootNode.rightNode === undefined) {
-            throw new RelationExpanderException('Invalid expression tree');
+            throw new RelationLinkerException('Invalid expression tree');
         }
 
-        const leftExpander = new RelationExpander(rootNode.leftNode, this._queryChain);
+        const leftExpander = new RelationLinker(rootNode.leftNode, this._relationChain);
         leftNodeResultTable = leftExpander.expand();
         rootNode.setLeftNode(leftExpander.getResult());
 
-        const rightExpander = new RelationExpander(rootNode.rightNode!, this._queryChain);
+        const rightExpander = new RelationLinker(rootNode.rightNode!, this._relationChain);
         rightNodeResultTable = rightExpander.expand();
         rootNode.setRightNode(rightExpander.getResult());
 
         if (leftNodeResultTable === rightNodeResultTable) return leftNodeResultTable;
 
-        const commonParent: string = this._queryChain.findLowestCommonParent(rightNodeResultTable, leftNodeResultTable);
+        const commonParent: string = this._relationChain.findLowestCommonParent(rightNodeResultTable, leftNodeResultTable);
 
         if (leftNodeResultTable !== commonParent) {
-            const relationPath: IQueryChainRelation[] = this._queryChain.findRelationPath(leftNodeResultTable, commonParent)!;
+            const relationPath: IRelationChainRelation[] = this._relationChain.findRelationPath(leftNodeResultTable, commonParent)!;
             for (const path of relationPath) {
                 const relationNode = new RelationNode(path.fromTable, path.fromField, path.toTable, path.toField);
                 relationNode.setLeftNode(rootNode.leftNode);
@@ -86,7 +86,7 @@ class RelationExpander {
         }
 
         if (rightNodeResultTable !== commonParent) {
-            const relationPath: IQueryChainRelation[] = this._queryChain.findRelationPath(rightNodeResultTable, commonParent)!;
+            const relationPath: IRelationChainRelation[] = this._relationChain.findRelationPath(rightNodeResultTable, commonParent)!;
             for (const path of relationPath) {
                 const relationNode = new RelationNode(path.fromTable, path.fromField, path.toTable, path.toField);
                 relationNode.setLeftNode(rootNode.rightNode);
@@ -102,4 +102,4 @@ class RelationExpander {
     }
 }
 
-export default RelationExpander;
+export default RelationLinker;

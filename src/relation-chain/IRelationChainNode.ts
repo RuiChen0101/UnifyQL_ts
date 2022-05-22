@@ -1,4 +1,4 @@
-export default interface IQueryChainRelation {
+export default interface IRelationChainNode {
     fromTable: string;
     fromField: string;
     toTable: string;
