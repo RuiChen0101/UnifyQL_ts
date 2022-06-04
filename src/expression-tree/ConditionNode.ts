@@ -1,5 +1,5 @@
 import IExpressionTreeNode from "./ExpressionTreeNode";
-import ExpressionTreeBuildException from "../exception/ExpressionTreeBuildException";
+import BadFormatException from "../exception/BadFormatException";
 
 type ModifierOp = '&' | '|' | '+' | '-' | '*' | '/';
 type ConditionOp = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'LIKE' | 'IS NULL' | 'IS NOT NULL' | 'IN';
@@ -18,7 +18,7 @@ class ConditionNode extends IExpressionTreeNode {
         this.conditionStr = conditionStr;
         const regex: RegExp = /[\(]?\s*(\w*)\.(\w*)\s*([\&\|\+\-\*\/])?\s*([^)]*)?\s*[\)]?\s*(=|!=|<|<=|>|>=|LIKE|NOT IN|IN|IS NULL|IS NOT NULL)\s*(.*)/g;
         const capturedGroups: RegExpExecArray | null = regex.exec(this.conditionStr);
-        if (capturedGroups === null) throw new ExpressionTreeBuildException('Invalid format');
+        if (capturedGroups === null) throw new BadFormatException('Invalid format');
         this.table = capturedGroups[1];
         this.field = capturedGroups[2];
         this.modifier = capturedGroups[3] as (ModifierOp | undefined);
@@ -26,7 +26,7 @@ class ConditionNode extends IExpressionTreeNode {
         this.conditionOp = capturedGroups[5] as ConditionOp;
         this.conditionValue = capturedGroups[6];
         if (!ConditionNode.isValidValue(this.conditionOp, this.conditionValue))
-            throw new ExpressionTreeBuildException('Invalid format');
+            throw new BadFormatException('Invalid format');
     }
 
     public static isValidValue(op: string, value?: string): boolean {
