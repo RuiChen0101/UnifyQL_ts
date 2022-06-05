@@ -11,6 +11,20 @@ describe('UnifyQLtoSQLConverter', () => {
         expect(sql).to.be.equal('SELECT tableA.* FROM tableA');
     });
 
+    it('should convert Count UnifyQL to SQL', () => {
+        const uql = 'COUNT tableA';
+        const converter = new UnifyQLtoSQLConverter();
+        const sql = converter.convert(uql);
+        expect(sql).to.be.equal('SELECT count(tableA.*) count FROM tableA');
+    });
+
+    it('should convert Sum UnifyQL to SQL', () => {
+        const uql = 'SUM tableA.fieldA1';
+        const converter = new UnifyQLtoSQLConverter();
+        const sql = converter.convert(uql);
+        expect(sql).to.be.equal('SELECT sum(tableA.fieldA1) sum FROM tableA');
+    });
+
     it('should convert UnifyQL to SQL with where orderBy and limit', () => {
         const uql = 'QUERY tableA WHERE tableA.fieldA=1 ORDER BY tableA.fieldA1 ASC LIMIT 0,100';
         const converter = new UnifyQLtoSQLConverter();

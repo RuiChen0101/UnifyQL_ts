@@ -1,14 +1,19 @@
 import 'mocha';
 import { expect } from 'chai';
+import IUnifyQLElement from '../../src/unify-ql-element/IUnifyQLElement';
+import EUnifyQLOperation from '../../src/unify-ql-element/EUnifyQLOperation';
 import RelationChainBuilder from '../../src/relation-chain/RelationChainBuilder';
 
 describe('RelationChainBuilder', () => {
     it('should build query chain', () => {
-        const builder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            ['tableB', 'tableC', 'tableD'],
-            ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
-        );
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: ['tableB', 'tableC', 'tableD'],
+            link: ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2'],
+            where: '',
+        }
+        const builder: RelationChainBuilder = new RelationChainBuilder(element);
 
         const relationChain = builder.build();
 
@@ -54,11 +59,14 @@ describe('RelationChainBuilder', () => {
     });
 
     it('should build query chain without with and link', () => {
-        const builder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            [],
-            []
-        );
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: [],
+            link: [],
+            where: '',
+        }
+        const builder: RelationChainBuilder = new RelationChainBuilder(element);
 
         const relationChain = builder.build();
 
@@ -70,12 +78,15 @@ describe('RelationChainBuilder', () => {
     });
 
     it('should throw exception if using undefined table', () => {
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: ['tableB', 'tableC'],
+            link: ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2'],
+            where: '',
+        }
         expect(function () {
-            const builder: RelationChainBuilder = new RelationChainBuilder(
-                'tableA',
-                ['tableB', 'tableC'],
-                ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
-            );
+            new RelationChainBuilder(element);
         }).to.throw('tableD.fieldD=tableA.fieldA1 using undefined table');
     });
 });

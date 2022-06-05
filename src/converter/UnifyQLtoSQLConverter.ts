@@ -1,17 +1,30 @@
 import IUnifyQLConverter from "./IUnifyQLConverter";
+import BadFormatException from "../exception/BadFormatException";
+import EUnifyQLOperation from "../unify-ql-element/EUnifyQLOperation";
 import extractQLElement from "../unify-ql-element/ExtractUnifyQlElement";
 
 class UnifyQLtoSQLConverter implements IUnifyQLConverter {
     public convert(unifyQl: string): string {
         const element = extractQLElement(unifyQl);
         const result: string[] = [];
-        const targetTable: string = element.queryTarget.split('.')[0];
-        element.with.push(targetTable);
-        if (element.queryTarget.includes('.')) {
-            const targetField: string = element.queryTarget.split('.')[1];
-            result.push(`SELECT ${element.queryTarget} ${targetField}`);
-        } else {
-            result.push(`SELECT ${targetTable}.*`);
+        element.with.push(element.queryTarget);
+        switch (element.operation) {
+            case EUnifyQLOperation.Query:
+                if (element.queryField !== undefined) {
+                    result.push(`SELECT ${element.queryTarget}.${element.queryField} ${element.queryField}`);
+                } else {
+                    result.push(`SELECT ${element.queryTarget}.*`);
+                }
+                break;
+            case EUnifyQLOperation.Count:
+                result.push(`SELECT count(${element.queryTarget}.*) count`);
+                break;
+            case EUnifyQLOperation.Sum:
+                if (element.queryField === undefined) {
+                    throw new BadFormatException('Invalid format');
+                }
+                result.push(`SELECT sum(${element.queryTarget}.${element.queryField}) sum`);
+                break;
         }
         result.push(`FROM ${element.with.join(',')}`);
         if (element.link.length !== 0) {

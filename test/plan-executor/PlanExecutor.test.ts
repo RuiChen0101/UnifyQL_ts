@@ -7,9 +7,11 @@ import injector from '../../src/utility/Injector';
 import IdGenerator from '../../src/utility/IdGenerator';
 import ServiceLookup from '../../src/lookup/ServiceLookup';
 import PlanExecutor from '../../src/plan-executor/PlanExecutor';
-import RelationChainBuilder from '../../src/relation-chain/RelationChainBuilder';
 import RelationLinker from '../../src/relation-linking/RelationLinker';
+import IUnifyQLElement from '../../src/unify-ql-element/IUnifyQLElement';
+import EUnifyQLOperation from '../../src/unify-ql-element/EUnifyQLOperation';
 import IExpressionTreeNode from '../../src/expression-tree/ExpressionTreeNode';
+import RelationChainBuilder from '../../src/relation-chain/RelationChainBuilder';
 import ExpressionTreeParser from '../../src/expression-tree/ExpressionTreeParser';
 import ExecutionPlanGenerator from '../../src/execution-plan/ExecutionPlanGenerator';
 
@@ -18,17 +20,22 @@ const serviceLookup: ServiceLookup = new ServiceLookup();
 
 describe('PlanExecutor', () => {
     it('should execute query with no condition', async () => {
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: [],
+            link: [],
+            where: '',
+            orderBy: ['tableA.fieldA2 DESC'],
+            limit: [0, 100]
+        }
+
         MockFetch.setJsonResult(200, [{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
-        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            ['tableB', 'tableC', 'tableD'],
-            ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
-        );
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(element);
         const relationChain = relationChainBuilder.build();
 
-        const whereStr: string = '';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr, ['tableA.fieldA2 DESC'], [0, 100])!;
+        const expressionTree: IExpressionTreeNode = parser.parse(element)!;
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
         linker.expand();
@@ -51,18 +58,62 @@ describe('PlanExecutor', () => {
         expect(queryReq.reqOption.body).to.be.equal('QUERY tableA ORDER BY tableA.fieldA2 DESC LIMIT 0, 100');
     });
 
-    it('should execute query with condition and relation from the same service', async () => {
+    it('should execute query with special query', async () => {
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Sum,
+            queryTarget: 'tableA',
+            queryField: 'fieldA3',
+            with: [],
+            link: [],
+            where: '',
+            orderBy: ['tableA.fieldA2 DESC'],
+            limit: [0, 100]
+        }
+
         MockFetch.setJsonResult(200, [{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
-        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            ['tableB', 'tableC', 'tableD'],
-            ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
-        );
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(element);
         const relationChain = relationChainBuilder.build();
 
-        const whereStr: string = '(tableC.fieldC1 & 2) != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
+        const expressionTree: IExpressionTreeNode = parser.parse(element)!;
+
+        const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
+        linker.expand();
+        const expandedTree = linker.getResult();
+
+        const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
+        generator.generate();
+
+        const executionPlan = generator.getExecutionPlan()!;
+
+        const executor = new PlanExecutor('root', executionPlan, serviceLookup);
+        const result = await executor.execute();
+
+        expect(result.id).to.be.equal('root');
+        expect(result.data).to.be.deep.equal([{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
+
+        const queryReq = MockFetch.requests[0];
+
+        expect(queryReq.reqUrl).to.be.equal('http://localhost:5000/query');
+        expect(queryReq.reqOption.body).to.be.equal('SUM tableA.fieldA3 ORDER BY tableA.fieldA2 DESC LIMIT 0, 100');
+    });
+
+
+    it('should execute query with condition and relation from the same service', async () => {
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: ['tableB', 'tableC', 'tableD'],
+            link: ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2'],
+            where: '(tableC.fieldC1 & 2) != 0',
+        }
+
+        MockFetch.setJsonResult(200, [{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(element);
+        const relationChain = relationChainBuilder.build();
+
+        const parser: ExpressionTreeParser = new ExpressionTreeParser();
+        const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
         linker.expand();
@@ -86,18 +137,21 @@ describe('PlanExecutor', () => {
     });
 
     it('should execute query with condition and relation from the different service', async () => {
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: ['tableB', 'tableC', 'tableD'],
+            link: ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2'],
+            where: 'tableD.fieldD1 != 0',
+        }
+
         MockFetch.setJsonResult(200, [{ fieldD: 1 }, { fieldD: 2 }, { fieldD: 3 }, { fieldD: 4 }]);
         MockFetch.setJsonResult(200, [{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
-        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            ['tableB', 'tableC', 'tableD'],
-            ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
-        );
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(element);
         const relationChain = relationChainBuilder.build();
 
-        const whereStr: string = 'tableD.fieldD1 != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
+        const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
         linker.expand();
@@ -125,20 +179,23 @@ describe('PlanExecutor', () => {
     });
 
     it('should execute query with recursive dependency', async () => {
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: ['tableB', 'tableC', 'tableD'],
+            link: ['tableC.fieldC=tableD.fieldD2', 'tableD.fieldD1=tableB.fieldB1', 'tableA.fieldA2=tableB.fieldB2'],
+            where: 'tableC.fieldC1 != 0',
+        }
+
         MockFetch.setJsonResult(200, [{ fieldC: 'A' }, { fieldC: 'B' }, { fieldC: 'C' }, { fieldC: 'D' }]);
         MockFetch.setJsonResult(200, [{ fieldD1: 1 }, { fieldD1: 2 }, { fieldD1: 3 }, { fieldD1: 4 }]);
         MockFetch.setJsonResult(200, [{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
         when(mockIdGenerator.nano8()).thenReturn('12345678').thenReturn('23456789');
-        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            ['tableB', 'tableC', 'tableD'],
-            ['tableC.fieldC=tableD.fieldD2', 'tableD.fieldD1=tableB.fieldB1', 'tableA.fieldA2=tableB.fieldB2']
-        );
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(element);
         const relationChain = relationChainBuilder.build();
 
-        const whereStr: string = 'tableC.fieldC1 != 0';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
+        const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
         linker.expand();
@@ -170,20 +227,23 @@ describe('PlanExecutor', () => {
     });
 
     it('should execute query with complex expression tree', async () => {
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: ['tableB', 'tableC', 'tableD'],
+            link: ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2'],
+            where: 'tableD.fieldD1 = 0 AND tableC.fieldC1 = 2 AND (tableD.fieldD2 = 1 OR tableB.fieldB = 3)',
+        }
+
         MockFetch.setJsonResult(200, [{ fieldD: 1 }, { fieldD: 2 }, { fieldD: 3 }, { fieldD: 4 }]);
         MockFetch.setJsonResult(200, [{ fieldD: 5 }, { fieldD: 6 }, { fieldD: 7 }, { fieldD: 8 }]);
         MockFetch.setJsonResult(200, [{ fieldA: 'fieldA', fieldA1: 'fieldA1', fieldA2: 'fieldA2' }]);
         when(mockIdGenerator.nano8()).thenReturn('12345678').thenReturn('23456789');
-        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            ['tableB', 'tableC', 'tableD'],
-            ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
-        );
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(element);
         const relationChain = relationChainBuilder.build();
 
-        const whereStr: string = 'tableD.fieldD1 = 0 AND tableC.fieldC1 = 2 AND (tableD.fieldD2 = 1 OR tableB.fieldB = 3)';
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse('tableA', whereStr);
+        const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
         linker.expand();

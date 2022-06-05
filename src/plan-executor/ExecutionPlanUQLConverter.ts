@@ -1,8 +1,20 @@
 import IExecutionPlan from "../execution-plan/IExecutionPlan";
+import EUnifyQLOperation from "../unify-ql-element/EUnifyQLOperation";
 
 class ExecutionPlanUQLConverter {
     public convert(plan: IExecutionPlan, dependency: { [key: string]: any[] }): string {
-        const result: string[] = [`QUERY ${plan.query}`];
+        const result: string[] = [];
+        switch (plan.operation) {
+            case EUnifyQLOperation.Query:
+                result.push(`QUERY ${plan.query}`);
+                break;
+            case EUnifyQLOperation.Count:
+                result.push(`COUNT ${plan.query}`);
+                break;
+            case EUnifyQLOperation.Sum:
+                result.push(`SUM ${plan.query}`);
+                break;
+        }
         if (plan.with.length !== 0) {
             result.push(`WITH ${plan.with.join(',')}`);
         }

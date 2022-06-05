@@ -28,6 +28,38 @@ describe('UnifyQL', () => {
         expect(queryReq.reqOption.body).to.be.equal('QUERY tableA');
     });
 
+    it('should execute query with count query', async () => {
+        MockFetch.setJsonResult(200, [{ count: 10 }]);
+
+        const uqlStr = 'COUNT tableA';
+
+        const unifyQL = new UnifyQL(serviceConfigSource);
+        const result = await unifyQL.query(uqlStr);
+
+        expect(result).to.be.deep.equal([{ count: 10 }]);
+
+        const queryReq = MockFetch.requests[0];
+
+        expect(queryReq.reqUrl).to.be.equal('http://localhost:5000/query');
+        expect(queryReq.reqOption.body).to.be.equal('COUNT tableA');
+    });
+
+    it('should execute query with sum query', async () => {
+        MockFetch.setJsonResult(200, [{ count: 10 }]);
+
+        const uqlStr = 'SUM tableA.fieldA1';
+
+        const unifyQL = new UnifyQL(serviceConfigSource);
+        const result = await unifyQL.query(uqlStr);
+
+        expect(result).to.be.deep.equal([{ count: 10 }]);
+
+        const queryReq = MockFetch.requests[0];
+
+        expect(queryReq.reqUrl).to.be.equal('http://localhost:5000/query');
+        expect(queryReq.reqOption.body).to.be.equal('SUM tableA.fieldA1');
+    });
+
     it('should execute query with specify field', async () => {
         MockFetch.setJsonResult(200, [{ fieldA: 'fieldA' }]);
 

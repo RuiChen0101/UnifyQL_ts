@@ -1,14 +1,19 @@
 import 'mocha';
 import { expect } from 'chai';
+import IUnifyQLElement from '../../src/unify-ql-element/IUnifyQLElement';
+import EUnifyQLOperation from '../../src/unify-ql-element/EUnifyQLOperation';
 import RelationChainBuilder from "../../src/relation-chain/RelationChainBuilder";
 
 describe('RelationChain', () => {
     it('should get direct descendant by table', () => {
-        const builder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            ['tableB', 'tableC', 'tableD'],
-            ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
-        );
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: ['tableB', 'tableC', 'tableD'],
+            link: ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2'],
+            where: '',
+        }
+        const builder: RelationChainBuilder = new RelationChainBuilder(element);
 
         const relationChain = builder.build();
 
@@ -33,11 +38,14 @@ describe('RelationChain', () => {
     });
 
     it('should get direct parent by table', () => {
-        const builder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            ['tableB', 'tableC', 'tableD'],
-            ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
-        );
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: ['tableB', 'tableC', 'tableD'],
+            link: ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2'],
+            where: '',
+        }
+        const builder: RelationChainBuilder = new RelationChainBuilder(element);
 
         const relationChain = builder.build();
 
@@ -57,11 +65,14 @@ describe('RelationChain', () => {
     });
 
     it('should check is table1 parent of table2', () => {
-        const builder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            ['tableB', 'tableC', 'tableD'],
-            ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
-        );
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: ['tableB', 'tableC', 'tableD'],
+            link: ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2'],
+            where: '',
+        }
+        const builder: RelationChainBuilder = new RelationChainBuilder(element);
 
         const relationChain = builder.build();
 
@@ -74,11 +85,14 @@ describe('RelationChain', () => {
     });
 
     it('should check is table1 descendant of table2', () => {
-        const builder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            ['tableB', 'tableC', 'tableD'],
-            ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
-        );
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: ['tableB', 'tableC', 'tableD'],
+            link: ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2'],
+            where: '',
+        }
+        const builder: RelationChainBuilder = new RelationChainBuilder(element);
 
         const relationChain = builder.build();
 
@@ -91,11 +105,14 @@ describe('RelationChain', () => {
     });
 
     it('should find lowest common parent of two table', () => {
-        const builder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            ['tableB', 'tableC', 'tableD'],
-            ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
-        );
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: ['tableB', 'tableC', 'tableD'],
+            link: ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2'],
+            where: '',
+        }
+        const builder: RelationChainBuilder = new RelationChainBuilder(element);
 
         const relationChain = builder.build();
 
@@ -105,11 +122,14 @@ describe('RelationChain', () => {
     });
 
     it('should find relation path between two table', () => {
-        const builder: RelationChainBuilder = new RelationChainBuilder(
-            'tableA',
-            ['tableB', 'tableC', 'tableD'],
-            ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2']
-        );
+        const element: IUnifyQLElement = {
+            operation: EUnifyQLOperation.Query,
+            queryTarget: 'tableA',
+            with: ['tableB', 'tableC', 'tableD'],
+            link: ['tableC.fieldC=tableB.fieldB1', 'tableD.fieldD=tableA.fieldA1', 'tableA.fieldA2=tableB.fieldB2'],
+            where: '',
+        }
+        const builder: RelationChainBuilder = new RelationChainBuilder(element);
 
         const relationChain = builder.build();
 

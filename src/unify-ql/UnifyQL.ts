@@ -20,11 +20,11 @@ class UnifyQL implements IUnifyQL {
     public async query(unifyQl: string): Promise<any> {
         const serviceLookup: ServiceLookup = new ServiceLookup();
         const element = extractQLElement(unifyQl.replaceAll('\n', ' '));
-        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(element.queryTarget, element.with, element.link);
+        const relationChainBuilder: RelationChainBuilder = new RelationChainBuilder(element);
         const relationChain = relationChainBuilder.build();
 
         const parser: ExpressionTreeParser = new ExpressionTreeParser();
-        const expressionTree: IExpressionTreeNode = parser.parse(element.queryTarget, element.where, element.orderBy, element.limit);
+        const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
         linker.expand();

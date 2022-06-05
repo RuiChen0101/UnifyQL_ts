@@ -1,6 +1,6 @@
 import EUnifyQLOperation from "./EUnifyQLOperation";
 
-export default interface IQLElement {
+export default interface IUnifyQLElement {
     operation: EUnifyQLOperation;
     queryTarget: string;
     queryField?: string;

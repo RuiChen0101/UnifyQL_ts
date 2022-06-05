@@ -5,11 +5,13 @@ import ServiceLookup from '../lookup/ServiceLookup';
 import RelationNode from '../expression-tree/RelationNode';
 import ConditionNode from '../expression-tree/ConditionNode';
 import OutputTargetNode from '../expression-tree/OutputTargetNode';
+import EUnifyQLOperation from '../unify-ql-element/EUnifyQLOperation';
 import BinaryOperatorNode from '../expression-tree/BinaryOperatorNode';
 import IExpressionTreeNode from '../expression-tree/ExpressionTreeNode';
 import ExecutionPlanGeneratorException from '../exception/ExecutionPlanGeneratorException';
 
 interface InternalExecutionPlan {
+    operation: EUnifyQLOperation,
     query: string,
     with: Set<string>,
     link: Set<string>,
@@ -46,6 +48,7 @@ class ExecutionPlanGenerator {
     public getExecutionPlan(): IExecutionPlan | undefined {
         if (this._executionPlan === undefined) return undefined;
         return {
+            operation: this._executionPlan.operation,
             query: this._executionPlan.query,
             with: Array.from(this._executionPlan.with),
             link: Array.from(this._executionPlan.link),
@@ -58,9 +61,11 @@ class ExecutionPlanGenerator {
 
     private buildOutputTargetNode(): string {
         const rootNode: OutputTargetNode = this._expressionTree as OutputTargetNode;
+        const query = rootNode.queryField === undefined ? rootNode.outputTarget : `${rootNode.outputTarget}.${rootNode.queryField}`;
         if (rootNode.leftNode === undefined) {
             this._executionPlan = {
-                query: rootNode.outputTarget,
+                operation: rootNode.operation,
+                query: query,
                 with: new Set<string>([]),
                 link: new Set<string>([]),
                 where: "",
@@ -77,7 +82,8 @@ class ExecutionPlanGenerator {
         const executionPlan = Generator.getExecutionPlan()!;
 
         this._executionPlan = {
-            query: rootNode.outputTarget,
+            operation: rootNode.operation,
+            query: query,
             with: new Set<string>(executionPlan.with),
             link: new Set<string>(executionPlan.link),
             where: executionPlan.where,
@@ -86,7 +92,7 @@ class ExecutionPlanGenerator {
             dependency: executionPlan.dependency
         }
 
-        return rootNode.outputTarget.split('.')[0];
+        return rootNode.outputTarget;
     }
 
     private buildBinaryOperator(): string {
@@ -104,6 +110,7 @@ class ExecutionPlanGenerator {
         const rightExecutionPlan = rightGenerator.getExecutionPlan()!;
 
         this._executionPlan = {
+            operation: EUnifyQLOperation.Query,
             query: rootNode.outputTarget!,
             with: new Set<string>([...leftExecutionPlan.with, ...rightExecutionPlan.with]),
             link: new Set<string>([...leftExecutionPlan.link, ...rightExecutionPlan.link]),
@@ -117,6 +124,7 @@ class ExecutionPlanGenerator {
     private buildCondition(): string {
         const rootNode: ConditionNode = this._expressionTree as ConditionNode;
         this._executionPlan = {
+            operation: EUnifyQLOperation.Query,
             query: rootNode.table,
             with: new Set<string>([]),
             link: new Set<string>([]),
@@ -133,6 +141,7 @@ class ExecutionPlanGenerator {
         const childExecutionPlan = generator.getExecutionPlan()!;
         if (this._serviceLookup.isAllFromSameService([resultTable, rootNode.toTable])) {
             this._executionPlan = {
+                operation: EUnifyQLOperation.Query,
                 query: rootNode.toTable,
                 with: new Set<string>([...childExecutionPlan.with, childExecutionPlan.query]),
                 link: new Set<string>([...childExecutionPlan.link, `${rootNode.fromTable}.${rootNode.fromField}=${rootNode.toTable}.${rootNode.toField}`]),
@@ -143,6 +152,7 @@ class ExecutionPlanGenerator {
             childExecutionPlan.query = `${rootNode.fromTable}.${rootNode.fromField}`;
             const dependencyId = injector.get<IdGenerator>('IdGenerator').nano8();
             this._executionPlan = {
+                operation: EUnifyQLOperation.Query,
                 query: rootNode.toTable,
                 with: new Set<string>([]),
                 link: new Set<string>([]),

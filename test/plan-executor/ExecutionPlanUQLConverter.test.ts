@@ -3,12 +3,14 @@ import { expect } from 'chai';
 
 import IExecutionPlan from "../../src/execution-plan/IExecutionPlan";
 import ExecutionPlanUQLConverter from "../../src/plan-executor/ExecutionPlanUQLConverter";
+import EUnifyQLOperation from '../../src/unify-ql-element/EUnifyQLOperation';
 
 const converter: ExecutionPlanUQLConverter = new ExecutionPlanUQLConverter();
 
 describe('ExecutionPlanUQLConverter', () => {
     it('should convert execution plan to UQL', () => {
         const plan: IExecutionPlan = {
+            "operation": EUnifyQLOperation.Query,
             "dependency": {},
             "with": ["tableB"],
             "link": ["tableA.fieldA=tableB.fieldB"],
@@ -23,6 +25,7 @@ describe('ExecutionPlanUQLConverter', () => {
 
     it('should convert execution plan to UQL with dependency', () => {
         const plan: IExecutionPlan = {
+            "operation": EUnifyQLOperation.Query,
             "dependency": {},
             "with": ["tableB"],
             "link": ["tableA.fieldA=tableB.fieldB"],
@@ -35,6 +38,7 @@ describe('ExecutionPlanUQLConverter', () => {
 
     it('should convert execution plan to UQL query only', () => {
         const plan: IExecutionPlan = {
+            "operation": EUnifyQLOperation.Query,
             "dependency": {},
             "with": [],
             "link": [],
@@ -43,5 +47,31 @@ describe('ExecutionPlanUQLConverter', () => {
         };
         const uql = converter.convert(plan, {});
         expect(uql).to.be.equal('QUERY tableA');
+    });
+
+    it('should convert execution plan to SUM query', () => {
+        const plan: IExecutionPlan = {
+            "operation": EUnifyQLOperation.Count,
+            "dependency": {},
+            "with": [],
+            "link": [],
+            "query": "tableA",
+            "where": ""
+        };
+        const uql = converter.convert(plan, {});
+        expect(uql).to.be.equal('COUNT tableA');
+    });
+
+    it('should convert execution plan to SUM query', () => {
+        const plan: IExecutionPlan = {
+            "operation": EUnifyQLOperation.Sum,
+            "dependency": {},
+            "with": [],
+            "link": [],
+            "query": "tableA.fieldA4",
+            "where": ""
+        };
+        const uql = converter.convert(plan, {});
+        expect(uql).to.be.equal('SUM tableA.fieldA4');
     });
 });

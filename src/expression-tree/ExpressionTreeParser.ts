@@ -1,16 +1,17 @@
+import IUnifyQLElement from "../unify-ql-element/IUnifyQLElement";
 import ExpressionTreeBuilder from "./ExpressionTreeBuilder";
 import IExpressionTreeNode from "./ExpressionTreeNode";
 import OutputTargetNode from "./OutputTargetNode";
 
 class ExpressionTreeParser {
 
-    public parse(query: string, whereStr: string, orderBy?: string[], limit?: number[]): IExpressionTreeNode {
-        if (whereStr === '') {
-            const outputNode = new OutputTargetNode(query, orderBy, limit);
+    public parse(element: IUnifyQLElement): IExpressionTreeNode {
+        if (element.where === '') {
+            const outputNode = new OutputTargetNode(element.operation, element.queryTarget, element.queryField, element.orderBy, element.limit);
             return outputNode;
         }
         const regex: RegExp = /\s*(AND|OR|\(|\))\s*/gm;
-        const tokens: string[] = whereStr.split(regex);
+        const tokens: string[] = element.where.split(regex);
         const builder: ExpressionTreeBuilder = new ExpressionTreeBuilder();
         for (const token of tokens) {
             switch (token) {
@@ -33,7 +34,7 @@ class ExpressionTreeParser {
                     break;
             }
         }
-        const outputNode = new OutputTargetNode(query, orderBy, limit);
+        const outputNode = new OutputTargetNode(element.operation, element.queryTarget, element.queryField, element.orderBy, element.limit);
         outputNode.setLeftNode(builder.getResult());
         return outputNode;
     }

@@ -1,5 +1,6 @@
 import RelationChain from "./RelationChain";
 import IRelationChainNode from "./IRelationChainNode";
+import IUnifyQLElement from "../unify-ql-element/IUnifyQLElement";
 import RelationChainException from "../exception/RelationChainException";
 
 type IRelationChainMap = { [key: string]: { [key: string]: IRelationChainNode } };
@@ -8,10 +9,10 @@ class RelationChainBuilder {
     private target: string = '';
     private completeRelationMap: IRelationChainMap = {};
 
-    constructor(target: string, associationTables: string[], relations: string[]) {
-        this.target = target.split('.')[0];
-        let definedTables: string[] = [this.target, ...associationTables];
-        for (const relation of relations) {
+    constructor(element: IUnifyQLElement) {
+        this.target = element.queryTarget;
+        let definedTables: string[] = [this.target, ...element.with];
+        for (const relation of element.link) {
             const tableRelation: IRelationChainNode = this.extractRelation(relation);
             if (!definedTables.includes(tableRelation.fromTable) || !definedTables.includes(tableRelation.toTable)) {
                 throw new RelationChainException(`${relation} using undefined table`);

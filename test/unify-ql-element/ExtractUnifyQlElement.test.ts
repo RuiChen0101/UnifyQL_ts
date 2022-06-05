@@ -25,6 +25,7 @@ describe('ExtractUnifyQlElement', () => {
                 "orderBy": [
                     "tableA.tableA3 ASC"
                 ],
+                "queryField": undefined,
                 "queryTarget": "tableA",
                 "where": "tableD.fieldD1 = 0 AND tableC.fieldC1 = 2 AND (tableD.fieldD2 = 1 OR tableB.fieldB = 3)",
                 "with": [
@@ -88,6 +89,7 @@ describe('ExtractUnifyQlElement', () => {
                 "orderBy": [
                     "tableA.tableA3 ASC"
                 ],
+                "queryField": undefined,
                 "queryTarget": "tableA",
                 "where": "tableD.fieldD1 = 0 AND tableC.fieldC1 = 2 AND (tableD.fieldD2 = 1 OR tableB.fieldB = 3)",
                 "with": [
