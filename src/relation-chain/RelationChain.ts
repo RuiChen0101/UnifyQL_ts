@@ -31,8 +31,8 @@ class RelationChain {
     }
 
     public findRelationPath(from: string, to: string): IRelationChainNode[] | undefined {
-        const result: IRelationChainNode[] = [];
         if (this.isDescendantOf(from, to)) {
+            const result: IRelationChainNode[] = [];
             let parents = this.backwardRelationMap[from];
             while (parents !== undefined) {
                 const parentTable = Object.keys(parents)[0];
@@ -43,18 +43,26 @@ class RelationChain {
                 parents = this.backwardRelationMap[parentTable];
             }
             return undefined;
-        } else {
+        } else if (this.isParentOf(from, to)) {
+            const path = [to]
             let parents = this.backwardRelationMap[to];
             while (parents !== undefined) {
                 const parentTable = Object.keys(parents)[0];
-                result.push(parents[parentTable]);
                 if (parentTable === from) {
-                    return result.reverse();
+                    let last = from
+                    const result: IRelationChainNode[] = [];
+                    for (const p of path) {
+                        result.push(this.forwardRelationMap[last][p])
+                        last = p
+                    }
+                    return result;
                 };
+                path.unshift(parentTable)
                 parents = this.backwardRelationMap[parentTable];
             }
             return undefined;
         }
+        return undefined;
     }
 
     public isDescendantOf(table1: string, table2: string): boolean {
@@ -69,16 +77,6 @@ class RelationChain {
             parents = this.backwardRelationMap[parentTable];
         }
         return false;
-    }
-
-    public getDirectDescendant(target: string): IRelationChainNode[] {
-        if (this.forwardRelationMap[target] === undefined) return [];
-        return Object.values(this.forwardRelationMap[target]);
-    }
-
-    public getDirectParent(target: string): IRelationChainNode[] {
-        if (this.backwardRelationMap[target] === undefined) return [];
-        return Object.values(this.backwardRelationMap[target]);
     }
 }
 

@@ -15,7 +15,7 @@ class RelationChainBuilder {
         for (const relation of element.link) {
             const tableRelation: IRelationChainNode = this.extractRelation(relation);
             if (!definedTables.includes(tableRelation.fromTable) || !definedTables.includes(tableRelation.toTable)) {
-                throw new RelationChainException(`${relation} using undefined table`);
+                throw new RelationChainException(`RelationChain: ${relation} using undefined table`);
             }
             this.safeMapAssign(this.completeRelationMap, tableRelation.fromTable, tableRelation.toTable, tableRelation);
             this.safeMapAssign(
@@ -36,7 +36,6 @@ class RelationChainBuilder {
         const backwardRelationMap: IRelationChainMap = {};
         let trackingTable: string[] = [this.target];
         let visitedTable: string[] = [];
-        const endNode: Set<string> = new Set();
         while (trackingTable.length !== 0) {
             const table: string = trackingTable.shift()!;
             const relation: { [key: string]: IRelationChainNode } = this.completeRelationMap[table];
@@ -45,30 +44,9 @@ class RelationChainBuilder {
                 continue;
             }
             const descendants: string[] = Object.keys(relation);
-            let hasNewDescendant = false;
             for (const descendant of descendants) {
                 if (visitedTable.includes(descendant)) continue;
-                hasNewDescendant = true;
                 this.safeMapAssign(forwardRelationMap, table, descendant, relation[descendant]);
-                trackingTable.push(descendant);
-            }
-            if (!hasNewDescendant) {
-                endNode.add(table);
-            }
-            visitedTable.push(table);
-        }
-        trackingTable = [this.target];
-        visitedTable = [];
-        while (trackingTable.length !== 0) {
-            const table: string = trackingTable.shift()!;
-            const relation: { [key: string]: IRelationChainNode } = this.completeRelationMap[table];
-            if (relation === undefined) {
-                visitedTable.push(table);
-                continue;
-            }
-            const descendants: string[] = Object.keys(relation);
-            for (const descendant of descendants) {
-                if (visitedTable.includes(descendant)) continue;
                 this.safeMapAssign(backwardRelationMap, descendant, table, this.completeRelationMap[descendant][table]);
                 trackingTable.push(descendant);
             }
@@ -83,14 +61,14 @@ class RelationChainBuilder {
     }
 
     private extractRelation(relation: string): IRelationChainNode {
-        const side = relation.split('=');
-        const left = side[0].split('.');
-        const right = side[1].split('.');
+        const regex: RegExp = /([^\s]+)\.([^\s]+)\s*=\s*([^\s]+)\.([^\s]+)/g;
+        const capturedGroups: RegExpExecArray | null = regex.exec(relation);
+        if (capturedGroups === null || capturedGroups.length !== 5) throw new RelationChainException(`RelationChain: ${relation} invalid format`);
         return {
-            fromTable: left[0],
-            fromField: left[1],
-            toTable: right[0],
-            toField: right[1]
+            fromTable: capturedGroups[1],
+            fromField: capturedGroups[2],
+            toTable: capturedGroups[3],
+            toField: capturedGroups[4]
         };
     }
 }
