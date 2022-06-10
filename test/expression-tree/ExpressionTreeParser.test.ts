@@ -397,7 +397,7 @@ describe('ExpressionTreeParser', () => {
                 queryTarget: 'tableA',
                 with: [],
                 link: [],
-                where: 'tableA.fieldA=123; DROP TABLE tableA--"',
+                where: 'tableA.fieldA=123; DROP TABLE tableA--',
             }
             parser.parse(element);
         }).to.throw('Bad state: empty tree');

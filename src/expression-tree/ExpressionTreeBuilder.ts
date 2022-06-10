@@ -1,6 +1,7 @@
 import ConditionNode from "./ConditionNode";
 import BinaryOperatorNode from "./BinaryOperatorNode";
 import IExpressionTreeNode from "./ExpressionTreeNode";
+import BadFormatException from '../exception/BadFormatException';
 import ExpressionTreeBuildException from "../exception/ExpressionTreeBuildException";
 
 class BrokenConditionNode extends IExpressionTreeNode {
@@ -19,22 +20,27 @@ class ExpressionTreeBuilder {
     private _nodeStack: IExpressionTreeNode[] = [];
 
     public buildCondition(condition: string): void {
-        if (!ConditionNode.isValidCondition(condition)) {
-            this._nodeStack.push(new BrokenConditionNode(condition));
-            this.tryRestoreBrokenCondition();
-            return;
+        try {
+            const node = new ConditionNode(condition);
+            if (this._expressionTree === undefined) {
+                this._expressionTree = node
+                return;
+            }
+            if (!(this._expressionTree instanceof BinaryOperatorNode)) {
+                throw new ExpressionTreeBuildException('Bad state: is not binary operator node');
+            }
+            if (this._expressionTree.rightNode !== undefined) {
+                throw new ExpressionTreeBuildException('Bad state: right node already been set');
+            }
+            this._expressionTree.setRightNode(new ConditionNode(condition));
+        } catch (e) {
+            if (e instanceof BadFormatException) {
+                this._nodeStack.push(new BrokenConditionNode(condition));
+                this.tryRestoreBrokenCondition();
+                return;
+            }
+            throw e
         }
-        if (this._expressionTree === undefined) {
-            this._expressionTree = new ConditionNode(condition);
-            return;
-        }
-        if (!(this._expressionTree instanceof BinaryOperatorNode)) {
-            throw new ExpressionTreeBuildException('Bad state: is not binary operator node');
-        }
-        if (this._expressionTree.rightNode !== undefined) {
-            throw new ExpressionTreeBuildException('Bad state: left node already been set');
-        }
-        this._expressionTree.setRightNode(new ConditionNode(condition));
     }
 
     public buildOr(): void {
