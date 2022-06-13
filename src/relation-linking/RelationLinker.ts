@@ -17,8 +17,8 @@ class RelationLinker {
         this._expressionTree = expressionTree;
     }
 
-    public expand(): string {
-        this._resultTable = this._expand();
+    public link(): string {
+        this._resultTable = this._linking();
         if (this._expressionTree instanceof BinaryOperatorNode) {
             (this._expressionTree as BinaryOperatorNode).setOutputTarget(this._resultTable);
         }
@@ -42,7 +42,7 @@ class RelationLinker {
         }
     }
 
-    private _expand(): string {
+    private _linking(): string {
         const rootNode = this._expressionTree;
         if (rootNode instanceof ConditionNode) {
             return (rootNode as ConditionNode).table;
@@ -51,25 +51,22 @@ class RelationLinker {
         if (rootNode instanceof OutputTargetNode) {
             if (rootNode.leftNode === undefined) return rootNode.outputTarget;
             const linker = new RelationLinker(rootNode.leftNode!, this._relationChain);
-            linker.expand();
+            linker.link();
             linker.finalize(rootNode.outputTarget);
             rootNode.setLeftNode(linker.getResult());
             return rootNode.outputTarget;
         }
-
-        let leftNodeResultTable: string;
-        let rightNodeResultTable: string;
 
         if (rootNode.leftNode === undefined || rootNode.rightNode === undefined) {
             throw new RelationLinkerException('Invalid expression tree');
         }
 
         const leftExpander = new RelationLinker(rootNode.leftNode, this._relationChain);
-        leftNodeResultTable = leftExpander.expand();
+        const leftNodeResultTable = leftExpander.link();
         rootNode.setLeftNode(leftExpander.getResult());
 
         const rightExpander = new RelationLinker(rootNode.rightNode!, this._relationChain);
-        rightNodeResultTable = rightExpander.expand();
+        const rightNodeResultTable = rightExpander.link();
         rootNode.setRightNode(rightExpander.getResult());
 
         if (leftNodeResultTable === rightNodeResultTable) return leftNodeResultTable;

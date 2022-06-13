@@ -27,7 +27,7 @@ describe('RelationLinker', () => {
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = linker.expand();
+        const resultTable = linker.link();
         const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
@@ -61,7 +61,7 @@ describe('RelationLinker', () => {
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = linker.expand();
+        const resultTable = linker.link();
         const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
@@ -100,7 +100,7 @@ describe('RelationLinker', () => {
         });
     });
 
-    it('should expand and link relation to the same level for expression tree', () => {
+    it('should link and link relation to the same level for expression tree', () => {
         const element: IUnifyQLElement = {
             operation: EUnifyQLOperation.Query,
             queryTarget: 'tableA',
@@ -117,7 +117,7 @@ describe('RelationLinker', () => {
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = linker.expand();
+        const resultTable = linker.link();
         const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
@@ -180,7 +180,7 @@ describe('RelationLinker', () => {
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = linker.expand();
+        const resultTable = linker.link();
         const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
@@ -251,7 +251,7 @@ describe('RelationLinker', () => {
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = linker.expand();
+        const resultTable = linker.link();
         const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
@@ -305,7 +305,7 @@ describe('RelationLinker', () => {
         });
     });
 
-    it('should expand and link relation for complex expression tree 1', () => {
+    it('should link relation for complex expression tree 1', () => {
         const element: IUnifyQLElement = {
             operation: EUnifyQLOperation.Query,
             queryTarget: 'tableA',
@@ -322,7 +322,7 @@ describe('RelationLinker', () => {
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = linker.expand();
+        const resultTable = linker.link();
         const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
@@ -430,7 +430,7 @@ describe('RelationLinker', () => {
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = linker.expand();
+        const resultTable = linker.link();
         const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
@@ -501,7 +501,7 @@ describe('RelationLinker', () => {
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
 
-        const resultTable = linker.expand();
+        const resultTable = linker.link();
         const resultTree = linker.getResult();
 
         expect(resultTable).to.be.equal('tableA');
