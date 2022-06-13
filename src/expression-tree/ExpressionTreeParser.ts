@@ -6,8 +6,8 @@ import OutputTargetNode from "./OutputTargetNode";
 class ExpressionTreeParser {
 
     public parse(element: IUnifyQLElement): IExpressionTreeNode {
+        const outputNode = new OutputTargetNode(element.operation, element.queryTarget, element.queryField, element.orderBy, element.limit);
         if (element.where === '') {
-            const outputNode = new OutputTargetNode(element.operation, element.queryTarget, element.queryField, element.orderBy, element.limit);
             return outputNode;
         }
         const regex: RegExp = /\s*(AND|OR|\(|\))\s*/gm;
@@ -34,7 +34,6 @@ class ExpressionTreeParser {
                     break;
             }
         }
-        const outputNode = new OutputTargetNode(element.operation, element.queryTarget, element.queryField, element.orderBy, element.limit);
         outputNode.setLeftNode(builder.getResult());
         return outputNode;
     }

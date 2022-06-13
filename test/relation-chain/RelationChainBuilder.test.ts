@@ -87,6 +87,6 @@ describe('RelationChainBuilder', () => {
         }
         expect(function () {
             new RelationChainBuilder(element);
-        }).to.throw('tableD.fieldD=tableA.fieldA1 using undefined table');
+        }).to.throw('RelationChain: tableD.fieldD=tableA.fieldA1 using undefined table');
     });
 });
