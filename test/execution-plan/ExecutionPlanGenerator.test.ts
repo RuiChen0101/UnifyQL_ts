@@ -36,7 +36,7 @@ describe('ExecutionPlanGenerator', () => {
         const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
-        linker.expand();
+        linker.link();
         const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
@@ -75,7 +75,7 @@ describe('ExecutionPlanGenerator', () => {
         const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
-        linker.expand();
+        linker.link();
         const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
@@ -111,7 +111,7 @@ describe('ExecutionPlanGenerator', () => {
         const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
-        linker.expand();
+        linker.link();
         const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
@@ -147,7 +147,7 @@ describe('ExecutionPlanGenerator', () => {
         const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
-        linker.expand();
+        linker.link();
         const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
@@ -187,7 +187,7 @@ describe('ExecutionPlanGenerator', () => {
         const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
-        linker.expand();
+        linker.link();
         const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
@@ -235,7 +235,7 @@ describe('ExecutionPlanGenerator', () => {
         const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
-        linker.expand();
+        linker.link();
         const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
@@ -297,7 +297,7 @@ describe('ExecutionPlanGenerator', () => {
         const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
-        linker.expand();
+        linker.link();
         const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
@@ -340,7 +340,7 @@ describe('ExecutionPlanGenerator', () => {
         const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
-        linker.expand();
+        linker.link();
         const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
@@ -392,7 +392,7 @@ describe('ExecutionPlanGenerator', () => {
         const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
-        linker.expand();
+        linker.link();
         const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);
@@ -448,7 +448,7 @@ describe('ExecutionPlanGenerator', () => {
         const expressionTree: IExpressionTreeNode = parser.parse(element);
 
         const linker: RelationLinker = new RelationLinker(expressionTree, relationChain);
-        linker.expand();
+        linker.link();
         const expandedTree = linker.getResult();
 
         const generator: ExecutionPlanGenerator = new ExecutionPlanGenerator(expandedTree, serviceLookup);

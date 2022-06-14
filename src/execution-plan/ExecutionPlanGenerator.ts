@@ -10,36 +10,25 @@ import BinaryOperatorNode from '../expression-tree/BinaryOperatorNode';
 import IExpressionTreeNode from '../expression-tree/ExpressionTreeNode';
 import ExecutionPlanGeneratorException from '../exception/ExecutionPlanGeneratorException';
 
-interface InternalExecutionPlan {
-    operation: EUnifyQLOperation,
-    query: string,
-    with: Set<string>,
-    link: Set<string>,
-    where: string,
-    orderBy?: string[],
-    limit?: number[],
-    dependency: { [key: string]: IExecutionPlan }
-}
-
 class ExecutionPlanGenerator {
     private _serviceLookup: ServiceLookup;
     private _expressionTree: IExpressionTreeNode;
-    private _executionPlan?: InternalExecutionPlan;
+    private _executionPlan?: IExecutionPlan;
 
     constructor(expressionTree: IExpressionTreeNode, serviceLookup: ServiceLookup) {
         this._expressionTree = expressionTree;
         this._serviceLookup = serviceLookup;
     }
 
-    public generate(): string {
+    public generate(): void {
         if (this._expressionTree instanceof BinaryOperatorNode) {
-            return this.buildBinaryOperator();
+            this.buildBinaryOperator();
         } else if (this._expressionTree instanceof ConditionNode) {
-            return this.buildCondition();
+            this.buildCondition();
         } else if (this._expressionTree instanceof RelationNode) {
-            return this.buildRelation();
+            this.buildRelation();
         } else if (this._expressionTree instanceof OutputTargetNode) {
-            return this.buildOutputTargetNode();
+            this.buildOutputTargetNode();
         } else {
             throw new ExecutionPlanGeneratorException('Invalid expression tree');
         }
@@ -50,8 +39,8 @@ class ExecutionPlanGenerator {
         return {
             operation: this._executionPlan.operation,
             query: this._executionPlan.query,
-            with: Array.from(this._executionPlan.with),
-            link: Array.from(this._executionPlan.link),
+            with: [...new Set(this._executionPlan.with)],
+            link: [...new Set(this._executionPlan.link)],
             where: this._executionPlan.where,
             orderBy: this._executionPlan.orderBy,
             limit: this._executionPlan.limit,
@@ -59,22 +48,21 @@ class ExecutionPlanGenerator {
         }
     }
 
-    private buildOutputTargetNode(): string {
+    private buildOutputTargetNode(): void {
         const rootNode: OutputTargetNode = this._expressionTree as OutputTargetNode;
         const query = rootNode.queryField === undefined ? rootNode.outputTarget : `${rootNode.outputTarget}.${rootNode.queryField}`;
         if (rootNode.leftNode === undefined) {
             this._executionPlan = {
                 operation: rootNode.operation,
                 query: query,
-                with: new Set<string>([]),
-                link: new Set<string>([]),
+                with: [],
+                link: [],
                 where: "",
                 orderBy: rootNode.orderBy,
                 limit: rootNode.limit,
                 dependency: {}
             }
-
-            return rootNode.outputTarget;
+            return
         }
 
         const Generator = new ExecutionPlanGenerator(rootNode.leftNode!, this._serviceLookup);
@@ -84,18 +72,17 @@ class ExecutionPlanGenerator {
         this._executionPlan = {
             operation: rootNode.operation,
             query: query,
-            with: new Set<string>(executionPlan.with),
-            link: new Set<string>(executionPlan.link),
+            with: executionPlan.with,
+            link: executionPlan.link,
             where: executionPlan.where,
             orderBy: rootNode.orderBy,
             limit: rootNode.limit,
             dependency: executionPlan.dependency
         }
 
-        return rootNode.outputTarget;
     }
 
-    private buildBinaryOperator(): string {
+    private buildBinaryOperator(): void {
         const rootNode: BinaryOperatorNode = this._expressionTree as BinaryOperatorNode;
         if (rootNode.leftNode === undefined || rootNode.rightNode === undefined) {
             throw new ExecutionPlanGeneratorException('Invalid expression tree');
@@ -112,39 +99,37 @@ class ExecutionPlanGenerator {
         this._executionPlan = {
             operation: EUnifyQLOperation.Query,
             query: rootNode.outputTarget!,
-            with: new Set<string>([...leftExecutionPlan.with, ...rightExecutionPlan.with]),
-            link: new Set<string>([...leftExecutionPlan.link, ...rightExecutionPlan.link]),
+            with: [...leftExecutionPlan.with, ...rightExecutionPlan.with],
+            link: [...leftExecutionPlan.link, ...rightExecutionPlan.link],
             where: `(${leftExecutionPlan.where} ${rootNode.opType} ${rightExecutionPlan.where})`,
             dependency: { ...leftExecutionPlan.dependency, ...rightExecutionPlan.dependency }
         }
 
-        return rootNode.outputTarget!;
     }
 
-    private buildCondition(): string {
+    private buildCondition(): void {
         const rootNode: ConditionNode = this._expressionTree as ConditionNode;
         this._executionPlan = {
             operation: EUnifyQLOperation.Query,
             query: rootNode.table,
-            with: new Set<string>([]),
-            link: new Set<string>([]),
+            with: [],
+            link: [],
             where: rootNode.conditionStr,
             dependency: {}
         };
-        return rootNode.table;
     }
 
-    private buildRelation(): string {
+    private buildRelation(): void {
         const rootNode: RelationNode = this._expressionTree as RelationNode;
         const generator = new ExecutionPlanGenerator(rootNode.leftNode!, this._serviceLookup);
-        const resultTable = generator.generate();
+        generator.generate();
         const childExecutionPlan = generator.getExecutionPlan()!;
-        if (this._serviceLookup.isAllFromSameService([resultTable, rootNode.toTable])) {
+        if (this._serviceLookup.isAllFromSameService([childExecutionPlan.query, rootNode.toTable])) {
             this._executionPlan = {
                 operation: EUnifyQLOperation.Query,
                 query: rootNode.toTable,
-                with: new Set<string>([...childExecutionPlan.with, childExecutionPlan.query]),
-                link: new Set<string>([...childExecutionPlan.link, `${rootNode.fromTable}.${rootNode.fromField}=${rootNode.toTable}.${rootNode.toField}`]),
+                with: [...childExecutionPlan.with, childExecutionPlan.query],
+                link: [...childExecutionPlan.link, `${rootNode.fromTable}.${rootNode.fromField}=${rootNode.toTable}.${rootNode.toField}`],
                 where: childExecutionPlan.where,
                 dependency: childExecutionPlan.dependency
             };
@@ -154,14 +139,13 @@ class ExecutionPlanGenerator {
             this._executionPlan = {
                 operation: EUnifyQLOperation.Query,
                 query: rootNode.toTable,
-                with: new Set<string>([]),
-                link: new Set<string>([]),
+                with: [],
+                link: [],
                 where: `${rootNode.toTable}.${rootNode.toField} IN {${dependencyId}}`,
                 dependency: {}
             };
             this._executionPlan.dependency[dependencyId] = childExecutionPlan
         }
-        return rootNode.toTable;
     }
 }
 
