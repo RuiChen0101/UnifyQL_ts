@@ -21,17 +21,15 @@ class PlanExecutor {
         const rootPlan = this._executionPlan;
         const dependencyIds: string[] = Object.keys(rootPlan.dependency);
         const dependencyResult: { [key: string]: any } = {};
-        if (dependencyIds.length !== 0) {
-            const executionPromises: Promise<IExecutionResult>[] = [];
-            for (const dependencyId of dependencyIds) {
-                const executor = new PlanExecutor(dependencyId, rootPlan.dependency[dependencyId], this._serviceLookup);
-                executionPromises.push(executor.execute());
-            }
-            const results: IExecutionResult[] = await Promise.all(executionPromises);
-            for (const result of results) {
-                dependencyResult[result.id] = result.data;
-            }
-        };
+        const executionPromises: Promise<IExecutionResult>[] = [];
+        for (const dependencyId of dependencyIds) {
+            const executor = new PlanExecutor(dependencyId, rootPlan.dependency[dependencyId], this._serviceLookup);
+            executionPromises.push(executor.execute());
+        }
+        const results: IExecutionResult[] = await Promise.all(executionPromises);
+        for (const result of results) {
+            dependencyResult[result.id] = result.data;
+        }
         const splitQuery = rootPlan.query.split('.');
         const targetTable = splitQuery[0];
         const targetField: string | undefined = splitQuery[1];

@@ -41,7 +41,7 @@ class ExecutionPlanUQLConverter {
             const data: any[] = dependency[dependencyId];
             let replaceWith = '';
             if (data.length === 0) replaceWith = '("")';
-            replaceWith = '(' + data.map(e => typeof e === 'number' ? e : `"${e}"`).join(',') + ')';
+            else replaceWith = '(' + data.map(e => typeof e === 'number' ? e : `"${e}"`).join(',') + ')';
             result = result.replace(`{${dependencyId}}`, replaceWith);
         }
         return result;

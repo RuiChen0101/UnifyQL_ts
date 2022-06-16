@@ -7,11 +7,6 @@ type ConditionOp = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'LIKE' | 'IS NULL' | '
 class ConditionNode extends IExpressionTreeNode {
     public readonly conditionStr: string;
     public readonly table: string;
-    public readonly field: string;
-    public readonly modifier?: ModifierOp;
-    public readonly modifyValue?: string;
-    public readonly conditionOp: ConditionOp;
-    public readonly conditionValue?: string;
 
     constructor(conditionStr: string) {
         super();
@@ -20,12 +15,7 @@ class ConditionNode extends IExpressionTreeNode {
         const capturedGroups: RegExpExecArray | null = regex.exec(this.conditionStr);
         if (capturedGroups === null) throw new BadFormatException('Invalid format');
         this.table = capturedGroups[1];
-        this.field = capturedGroups[2];
-        this.modifier = capturedGroups[3] as (ModifierOp | undefined);
-        this.modifyValue = capturedGroups[4];
-        this.conditionOp = capturedGroups[5] as ConditionOp;
-        this.conditionValue = capturedGroups[6];
-        if (!ConditionNode.isValidValue(this.conditionOp, this.conditionValue))
+        if (!ConditionNode.isValidValue(capturedGroups[5] as ConditionOp, capturedGroups[6]))
             throw new BadFormatException('Invalid format');
     }
 
@@ -38,15 +28,6 @@ class ConditionNode extends IExpressionTreeNode {
             return value !== null && /^\(([^\(\),]+,)*([^\(\),]+)\)$/.test(value!);
         }
         return false;
-    }
-
-    public static isValidCondition(str: string): boolean {
-        try {
-            new ConditionNode(str);
-            return true;
-        } catch (e) {
-            return false;
-        }
     }
 }
 
