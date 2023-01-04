@@ -20,6 +20,10 @@ class Injector {
         return instance;
     }
 
+    public exist(name: string): boolean {
+        return name in instancesPool;
+    }
+
     public remove(name: string): void {
         delete instancesPool[name];
     }
