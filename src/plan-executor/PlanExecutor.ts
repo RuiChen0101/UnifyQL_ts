@@ -1,8 +1,8 @@
 import injector from "../utility/Injector";
-import FetchProxy from "../utility/FetchProxy";
 import IExecutionResult from "./IExecutionResult";
 import ServiceLookup from "../lookup/ServiceLookup";
 import IExecutionPlan from "../execution-plan/IExecutionPlan";
+import IRequestManager from "../request-manager/IRequestManager";
 import ExecutionPlanUQLConverter from "./ExecutionPlanUQLConverter";
 import PlanExecutorException from "../exception/PlanExecutorException";
 
@@ -39,18 +39,18 @@ class PlanExecutor {
         const converter = new ExecutionPlanUQLConverter();
         const uql = converter.convert(rootPlan, dependencyResult);
 
-        const res = await injector.get<FetchProxy>('FetchProxy').fetch(requestUrl, {
-            method: 'POST',
-            body: uql
-        });
+        const response = await injector.get<IRequestManager>('RequestManager').request(
+            requestUrl,
+            uql,
+        );
 
-        if (res.status === 404) {
+        if (response.status === 404) {
             return { id: this._id, data: [] };
-        } else if (res.status >= 400) {
-            throw new PlanExecutorException(`Service ${serviceName} response ${res.status} when executing ${uql}`);
+        } else if (response.status >= 400) {
+            throw new PlanExecutorException(`Service ${serviceName} response ${response.status} when executing ${uql}`);
         }
 
-        const data: any[] = (await res.json()) as any[];
+        const data: any[] = response.data;
 
         if (targetField === undefined || this._id === 'root') {
             return {

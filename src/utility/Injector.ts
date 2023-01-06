@@ -1,9 +1,9 @@
 import IdGenerator from './IdGenerator';
-import FetchProxy from './FetchProxy';
+import DefaultRequestManager from '../request-manager/DefaultRequestManager';
 
 const instancesPool: { [key: string]: any } = {
     IdGenerator: new IdGenerator(),
-    FetchProxy: new FetchProxy()
+    RequestManager: new DefaultRequestManager()
 }
 
 class Injector {

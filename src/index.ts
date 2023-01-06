@@ -6,3 +6,7 @@ export default UnifyQL;
 export {
     IUnifyQl,
 }
+
+export * from './cache/index';
+export * from './service-config/index';
+export * from './request-manager/index';

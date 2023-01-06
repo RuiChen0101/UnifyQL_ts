@@ -21,6 +21,9 @@
             ],
             "cache": [
                 "lib/cache"
+            ],
+            "request-manager": [
+                "lib/request-manager"
             ]
         }
     },
@@ -40,6 +43,11 @@
             "types": "./lib/cache/index.d.ts",
             "require": "./lib/cache/index.js",
             "import": "./lib/esm/cache/index.js"
+        },
+        "./request-manager": {
+            "types": "./lib/request-manager/index.d.ts",
+            "require": "./lib/request-manager/index.js",
+            "import": "./lib/esm/request-manager/index.js"
         }
     },
     "scripts": {

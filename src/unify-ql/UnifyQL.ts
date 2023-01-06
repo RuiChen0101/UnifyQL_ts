@@ -5,8 +5,9 @@ import IUnifyQL from "./IUnifyQL";
 import injector from "../utility/Injector";
 import ServiceLookup from "../lookup/ServiceLookup";
 import PlanExecutor from "../plan-executor/PlanExecutor";
-import IExecutionPlanCache from '../cache/IExecutionPlanCache';
+import IExecutionPlanCache from "../cache/IExecutionPlanCache";
 import RelationLinker from "../relation-linking/RelationLinker";
+import IRequestManager from "../request-manager/IRequestManager";
 import IExpressionTreeNode from "../expression-tree/ExpressionTreeNode";
 import extractQLElement from "../unify-ql-element/ExtractUnifyQlElement";
 import RelationChainBuilder from "../relation-chain/RelationChainBuilder";
@@ -16,10 +17,13 @@ import ExecutionPlanGenerator from "../execution-plan/ExecutionPlanGenerator";
 
 class UnifyQL implements IUnifyQL {
 
-    constructor(serviceConfigSource: IServiceConfigSource, cache?: IExecutionPlanCache) {
+    constructor(serviceConfigSource: IServiceConfigSource, requestManager?: IRequestManager, cache?: IExecutionPlanCache) {
         injector.set('ServiceConfigSource', serviceConfigSource);
         if (cache !== undefined) {
             injector.set('ExecutionPlanCache', cache);
+        }
+        if (requestManager !== undefined) {
+            injector.set('RequestManager', requestManager);
         }
     }
 

@@ -1,7 +1,3 @@
-import IServiceConfigSource from "./IServiceConfigSource";
-import FileServiceConfigSource from "./FileServiceConfigSource";
-
-export {
-    IServiceConfigSource,
-    FileServiceConfigSource
-}
+export * from "./IServiceConfig";
+export * from "./IServiceConfigSource";
+export * from "./FileServiceConfigSource";
